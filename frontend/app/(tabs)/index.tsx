@@ -19,7 +19,12 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
+        
       </ThemedView>
+      <Image
+          source={require('@/assets/images/cat-transparent.png')}
+          style={styles.cat}
+        />
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -72,4 +77,8 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  cat: {
+    width: 300,
+    height: 300
+  }
 });
