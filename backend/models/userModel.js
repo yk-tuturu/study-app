@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     password: {type:String,required:true,unique:true}, 
     coins: {type:Number, default:0}, 
     pet: {
-        item: [{ type: mongoose.Schema.Types.ObjectId, ref: 'item' }]
+        wearing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'item'}]
       }
 }, {minimize:false}) 
 
