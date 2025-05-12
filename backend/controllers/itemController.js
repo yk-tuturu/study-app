@@ -42,7 +42,7 @@ const listItemsByType = async (req, res) => {
     // Return the filtered items
     return res.status(200).json({
             success: true,
-            itemList: items,
+            data: items,
         })
   } catch (error) {
     console.error(error);
@@ -92,7 +92,7 @@ const buyItem = async (req, res) => {
 
       res.status(200).json({
         message: "Item purchased successfully",
-        owned_items: user.owned_items
+        data: user.owned_items
       });
     } catch (error) {
       await session.abortTransaction();

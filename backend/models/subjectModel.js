@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 
 const subjectSchema = new mongoose.Schema({
     name: {type:String,required:true}, 
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
     totalhours: {type:Number,default:0}, 
 }, {minimize:false}) 
 
