@@ -29,7 +29,7 @@ const loginUser = async (req, res) => {
 
 // create token 
 const createToken = (id) => {
-    return jwt.sign({id: id, isAdmin: false}, process.env.JWT_SECRET)
+    return jwt.sign({id: id}, process.env.JWT_SECRET)
 }
 
 // register user
@@ -152,6 +152,46 @@ const getUserInfo = async (req, res) => {
     }
 };
 
+// get accessories currently worn by pet 
+const getAccessories = async (req, res) => {
+    const { userID } = req.body;
+
+    if (!userID) {
+        return res.status(400).json({ success: false, message: "Invalid input: userID is required." });
+    }
+
+    try {
+        const user = await userModel.findById(userID)
+            .populate('pet.wearing.head')
+            .populate('pet.wearing.neck')
+            .populate('pet.wearing.body')
+            .populate('pet.wearing.tail');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            });
+        }
+
+        const accessories = {
+            head: user.pet?.wearing?.head || null,
+            neck: user.pet?.wearing?.neck || null,
+            body: user.pet?.wearing?.body || null,
+            tail: user.pet?.wearing?.tail || null
+        };
+
+        return res.status(200).json({
+            success: true,
+            data: accessories,
+        });
+
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        return res.status(500).json({ success: false, message: "An error occurred while fetching user info." });
+    }
+};
+
 // add coins after finishing a study session
 const addCoins = async (req, res) => {
     const { userID, coinAmount } = req.body; 
@@ -182,4 +222,4 @@ const addCoins = async (req, res) => {
     }
 };
 
-export {loginUser, registerUser, changePassword, getUserInfo, addCoins}; 
+export {loginUser, registerUser, changePassword, getUserInfo, addCoins, getAccessories}; 
