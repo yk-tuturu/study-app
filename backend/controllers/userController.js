@@ -3,6 +3,11 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import validator from "validator"
 
+// create token 
+const createToken = (id) => {
+    return jwt.sign({id: id}, process.env.JWT_SECRET)
+}
+
 // Login function 
 const loginUser = async (req, res) => {
     const {email,password} = req.body; 
@@ -27,22 +32,11 @@ const loginUser = async (req, res) => {
     }
 }
 
-// create token 
-const createToken = (id) => {
-    return jwt.sign({id: id}, process.env.JWT_SECRET)
-}
-
 // register user
 const registerUser = async (req, res) => {
     const {name, email, password, confirmPassword} = req.body; 
 
     try {
-        // check if account already exists
-        const exists = await userModel.findOne({email})
-        if (exists) {
-            return res.json({success:false, message:"Account already exists"})
-        }
-
         // validate email and password 
         if (!validator.isEmail(email)) {
             return res.json({success:false, message:"Please enter a valid email"})
@@ -54,6 +48,12 @@ const registerUser = async (req, res) => {
 
         if (password.length < 8 ) {
             return res.json({success:false, message:"Password length should be greater than 8"})
+        }
+
+        // check if account already exists
+        const exists = await userModel.findOne({email})
+        if (exists) {
+            return res.json({success:false, message:"Account already exists"})
         }
 
         // hash user password 

@@ -1,5 +1,6 @@
 import itemModel from "../models/itemModel.js";
 import userModel from "./models/userModel"; 
+import mongoose from "mongoose";
 
 const addItem = async (req, res) => {
     
@@ -7,7 +8,7 @@ const addItem = async (req, res) => {
 
     const item = new itemModel({
         name: req.body.name, 
-        type: req.body,type, 
+        type: req.body.type, 
         price: req.body.price, 
         description: req.body.description, 
         image: image_filename, 
@@ -26,7 +27,7 @@ const addItem = async (req, res) => {
 // list all items by type 
 const listItemsByType = async (req, res) => {
   try {
-    const { type } = req.body.type;  
+    const { type } = req.body;
     
     if (!type) {
       return res.status(400).json({ message: "item type is required" });
@@ -78,9 +79,6 @@ const buyItem = async (req, res) => {
     try {
       // Deduct the price of the item from the user's coins
       user.coins -= item.price;
-
-      // Save the user with the updated coin balance
-      await user.save({ session });
 
       // Add the item to the user's owned items list
       user.owned_items.push(itemId);
@@ -136,12 +134,12 @@ const wearItem = async (req, res) => {
       // If an item is already being worn in that part, replace with the new item)
       if (user.pet.wearing[item.type] == itemId) {
         // Remove current item 
-        user.pet.wearing[part] = null;
+        user.pet.wearing[item.type] = null; 
       }
 
       else {
         // change current item to item in req body
-        user.pet.wearing[part] = itemId;
+        user.pet.wearing[item.type] = itemId;
       }
 
       // Save the user with the updated wearing list
