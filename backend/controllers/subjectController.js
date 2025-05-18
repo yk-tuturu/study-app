@@ -18,10 +18,10 @@ const newSubject = async (req, res) => {
 }
 
 const deleteSubject = async (req, res) => {
-    const { userID, subjectName } = req.body;
+    const { userId, subjectName } = req.body;
 
     try {
-        const deletedSubject = await subjectModel.findOneAndDelete({ userID, name });
+        const deletedSubject = await subjectModel.findOneAndDelete({ userId, subjectName });
 
         if (!deletedSubject) {
             return res.status(404).json({ success: false, message: "Subject not found or does not belong to user" });
@@ -35,10 +35,10 @@ const deleteSubject = async (req, res) => {
 };
 
 const updateHours = async (req, res) => {
-    const { userID, subjectName, hours } = req.body;
+    const { userId, subjectName, hours } = req.body;
 
-    if (!userID || !hours || !subjectName) {
-        return res.status(400).json({ success: false, message: "Invalid input: userID, study duration and subject name are required." });
+    if (!userId || !hours || !subjectName) {
+        return res.status(400).json({ success: false, message: "Invalid input: userId, study duration and subject name are required." });
     }
 
     if (typeof hours !== 'number' || hours <= 0) {
@@ -47,7 +47,7 @@ const updateHours = async (req, res) => {
 
     try {
         const updatedSubject = await subjectModel.findOneAndUpdate(
-            { userId: userID, name: subjectName },
+            { userId: userId, name: subjectName },
             { $inc: { totalhours: hours } },
             { new: true }
         );
