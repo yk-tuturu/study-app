@@ -1,32 +1,34 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
+import colors from '@/constants/Colors';
 
-import { useThemeColor } from '@/hooks/useThemeColor';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: 'default' | 'font_xs' | 'font_sm' | 'font_md' | 'font_lg' | 'font_xl' | "font_xxl" | "subtitle";
 };
 
-export function ThemedText({
+function ThemedText({
   style,
   lightColor,
   darkColor,
   type = 'default',
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
   return (
     <Text
       style={[
-        { color },
         type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+        type === 'font_xs' ? styles.font_xs : undefined,
+        type === 'font_sm' ? styles.font_sm : undefined,
+        type === 'font_md' ? styles.font_md : undefined,
+        type === 'font_lg' ? styles.font_lg : undefined,
+        type === 'font_xl' ? styles.font_xl : undefined,
+        type === 'font_xxl' ? styles.font_xxl : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
         style,
+        {color: colors.accent}
       ]}
       {...rest}
     />
@@ -37,24 +39,41 @@ const styles = StyleSheet.create({
   default: {
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: "JockeyOne"
   },
-  defaultSemiBold: {
+  font_xs: {
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: '600',
+    fontFamily: "JockeyOne"
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+  font_sm: {
+    fontSize: 24,
     lineHeight: 32,
+    fontFamily: "JockeyOne"
+  },
+  font_md: {
+    fontSize: 32,
+    lineHeight: 32,
+    fontFamily: "JockeyOne"
+  },
+  font_lg: {
+    fontSize: 48,
+    lineHeight: 48,
+    fontFamily: "JockeyOne"
+  },
+  font_xl: {
+    fontSize: 72,
+    lineHeight: 72,
+    fontFamily: "JockeyOne"
+  },
+  font_xxl: {
+    fontSize: 120,
+    lineHeight: 120,
+    fontFamily: "JockeyOne"
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
-  },
+    fontSize: 16
+  }
 });
+
+export default ThemedText;

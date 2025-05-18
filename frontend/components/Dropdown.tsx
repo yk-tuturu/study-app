@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, ReactNode } from 'react';
 import { View, Modal, StyleSheet, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import colors from '@/constants/Colors';
 
 interface DropdownMenuProps {
   visible: boolean;
@@ -24,6 +25,7 @@ export const MenuOption = ({
   );
 };
 
+// right aligned dropdown, dunno if we need a left aligned variant for now
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   visible,
   handleOpen,
@@ -50,7 +52,9 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   return (
     <View>
       <TouchableWithoutFeedback onPress={handleOpen}>
-        <View ref={triggerRef}>{trigger}</View>
+        <View style={{alignSelf: "flex-end"}} ref={triggerRef}>
+          {trigger}
+        </View>
       </TouchableWithoutFeedback>
       {visible && (
         <Modal
@@ -89,17 +93,20 @@ const styles = StyleSheet.create({
   menu: {
     position: 'absolute',
     width: 80,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    padding: 10,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    borderColor: colors.accent,
+    borderWidth: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
-    marginTop: 5
+    marginTop: 4
   },
   menuOption: {
-    padding: 5,
+    padding: 4
   },
 });
