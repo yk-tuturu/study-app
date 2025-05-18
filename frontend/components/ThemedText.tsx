@@ -38,8 +38,7 @@ function ThemedText({
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
-    lineHeight: 24,
-    fontFamily: "JockeyOne"
+    lineHeight: 24
   },
   font_xs: {
     fontSize: 16,

@@ -6,8 +6,9 @@ import {Toggle} from "@/components/Toggle";
 import ThemedText from "@/components/ThemedText";
 import colors from "@/constants/Colors";
 
-import gs from "../../constants/GlobalStyles"
 import IconButton from "@/components/IconButton";
+import SubjectTag from "@/components/SubjectTag";
+import CircularButton from "@/components/CircularButton";
 
 export default function Timer() {
     const router = useRouter();
@@ -62,10 +63,33 @@ export default function Timer() {
                     <ThemedText type="subtitle">Study until the timer runs out!</ThemedText>
                 </View>
 
-                <View style={{marginBottom: 24}}>
+                <View style={{marginBottom: 16}}>
                     <ThemedText type="font_sm">Subjects</ThemedText>
                     <ThemedText type="subtitle">Select your subject goal</ThemedText>
                 </View>
+                <View style={styles.subjectContainer}>
+                    <SubjectTag>
+                        <ThemedText type="subtitle">CS1101S</ThemedText>
+                    </SubjectTag>
+                    <SubjectTag>
+                        <ThemedText type="subtitle">CS1101S</ThemedText>
+                    </SubjectTag>
+                    <SubjectTag>
+                        <ThemedText type="subtitle">CS1101Sa</ThemedText>
+                    </SubjectTag>
+                    <SubjectTag>
+                        <ThemedText type="subtitle">CS1101S</ThemedText>
+                    </SubjectTag>
+                    <SubjectTag>
+                        <ThemedText type="subtitle">CS1101Sasa</ThemedText>
+                    </SubjectTag>
+                </View>
+                <CircularButton style={styles.playButton}>
+                    <Image
+                        source={require("../../assets/images/play.png")}
+                        style={styles.playButtonImage}
+                    />
+                </CircularButton>
                 
             </SafeAreaView>
         </View>
@@ -79,7 +103,8 @@ const styles = StyleSheet.create({
     },
     uiContainer: {
         paddingHorizontal: 20,
-        paddingVertical: 10
+        paddingVertical: 10,
+        flex: 1
     },
     centerContainer: {
         width: "100%",
@@ -116,5 +141,19 @@ const styles = StyleSheet.create({
         height: 28,
         marginHorizontal: 16,
         marginVertical: 6
+    },
+    subjectContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        width: "100%",
+    },
+    playButton: {
+        position: "absolute",
+        alignSelf: "center",
+        bottom: "8%"
+    },
+    playButtonImage: {
+        width: 48,
+        height: 48
     }
 })
