@@ -7,6 +7,7 @@ import {MenuOption, DropdownMenu} from '@/components/Dropdown';
 import Background from "@/components/Background";
 import IconButton from "@/components/IconButton";
 import ThemedText from "@/components/ThemedText";
+import TimerDisplay from "@/components/TimerDisplay"
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ export default function HomeScreen() {
   return (
     <Background ref={rugRef}>
         <SafeAreaView style={styles.uiContainer}>
+          <TimerDisplay style={styles.timerDisplay}/>
           <DropdownMenu
             visible={menuVisible}
             handleOpen={() => setMenuVisible(true)}
@@ -67,7 +69,8 @@ const styles = StyleSheet.create({
     alignSelf: "center"
   },
   uiContainer: {
-    padding: 10
+    padding: 10,
+    flex: 1
   }, 
   triggerStyle: {
     backgroundColor: "white",
@@ -83,7 +86,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32
   },
-  triggerText: {
-    fontSize: 16,
+  timerDisplay: {
+    position: "absolute",
+    alignSelf: "center",
+    top: "23%"
   }
 });
