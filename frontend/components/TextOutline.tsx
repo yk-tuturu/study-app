@@ -38,17 +38,6 @@ const TextOutline: React.FC<Props> = ({
         });
     }
 
-    const offsets = [
-        {width: 0, height: -stroke*1.2},
-        {width: -stroke, height: -stroke},
-        {width: stroke, height: -stroke},
-        {width: stroke, height: 0},
-        {width: 0, height: stroke},
-        {width: -stroke, height: stroke},
-        {width: stroke, height: stroke},
-        {width: -stroke * 1.2, height: 0}
-    ]
-
     const top = createClones(0, -stroke * 1.2, color);
     const topLeft = createClones(-stroke, -stroke, color);
     const topRight = createClones(stroke, -stroke, color);
@@ -60,20 +49,6 @@ const TextOutline: React.FC<Props> = ({
 
     return (
         <View style={style}>
-        {/* {offsets.map((offset, index)=> {
-            return (
-                <ThemedText
-                    type="font_xxl"
-                    key={index}
-                    style={[styles.outline, {
-                        textShadowOffset: offset,
-                        textShadowColor: color,
-                        textShadowRadius: 1
-                    }]}
-                >30:00</ThemedText>
-            )
-        })} */}
-
         <View style={{position: "absolute"}}>{top}</View>
         <View style={{position: "absolute"}}>{topLeft}</View>
         <View style={{position: "absolute"}}>{topRight}</View>

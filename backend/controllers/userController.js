@@ -39,21 +39,21 @@ const registerUser = async (req, res) => {
     try {
         // validate email and password 
         if (!validator.isEmail(email)) {
-            return res.json({success:false, message:"Please enter a valid email"})
+            return res.status(500).json({success:false, message:"Please enter a valid email"})
         }
 
         if (confirmPassword !== password) {
-            return res.json({success:false, message:"Please ensure both passwords are the same"})
+            return res.status(500).json({success:false, message:"Please ensure both passwords are the same"})
         }
 
         if (password.length < 8 ) {
-            return res.json({success:false, message:"Password length should be greater than 8"})
+            return res.status(500).json({success:false, message:"Password length should be greater than 8"})
         }
 
         // check if account already exists
         const exists = await userModel.findOne({email})
         if (exists) {
-            return res.json({success:false, message:"Account already exists"})
+            return res.status(500).json({success:false, message:"Account already exists"})
         }
 
         // hash user password 
@@ -71,11 +71,11 @@ const registerUser = async (req, res) => {
 
         // create token 
         const token = createToken(user._id)
-        res.json({success:true, token})
+        res.status(200).json({success:true, token})
 
     } catch (error) {
         console.log(error);
-        res.json({success:false, message:"Error"})
+        res.status(500).json({success:false, message:"Error"})
     }
 }
 
@@ -125,7 +125,7 @@ const changePassword = async (req, res) => {
 
 // get user's information (name, email, voucherBalance)
 const getUserInfo = async (req, res) => {
-    const { userID } = req.body; 
+    const { userID } = req; 
 
     if (!userID) {
         return res.status(400).json({success: false, message: "Invalid input: userID is required."});

@@ -5,9 +5,13 @@ import {Link} from "expo-router"
 
 import {MenuOption, DropdownMenu} from '@/components/Dropdown';
 import Background from "@/components/Background";
-import IconButton from "@/components/IconButton";
+import IconButton from "@/components/buttons/IconButton";
+import IconButtonStatic from "@/components/buttons/IconButtonStatic"
 import ThemedText from "@/components/ThemedText";
-import TimerDisplay from "@/components/TimerDisplay"
+import TimerDisplay from "@/components/TimerDisplay";
+import {useTimer} from "@/context/timerContext";
+import { useAuth } from '@/context/authContext';
+import { useRouter } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,6 +19,12 @@ export default function HomeScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [catPosition, setCatPosition] = useState(0);
   const rugRef = useRef<RNImage>(null)
+
+  const {startTimer, remaining, isRunning, getDuration} = useTimer();
+
+  const {logout} = useAuth();
+  
+  const router = useRouter();
 
   useEffect(() => {
       if (rugRef.current) {
@@ -24,21 +34,28 @@ export default function HomeScreen() {
       }
     }, [rugRef]);
 
+    const handleLogout = async() => {
+      await logout();
+      router.push("./login")
+    }
+
   return (
     <Background ref={rugRef}>
         <SafeAreaView style={styles.uiContainer}>
-          <TimerDisplay style={styles.timerDisplay}/>
+          
+          <TimerDisplay time={remaining} duration={getDuration()} style={styles.timerDisplay}/>
+          
           <DropdownMenu
             visible={menuVisible}
             handleOpen={() => setMenuVisible(true)}
             handleClose={() => setMenuVisible(false)}
             trigger={
-              <IconButton>
+              <IconButtonStatic>
                 <Image
                   source={require("../../assets/images/menu.png")}
                   style={{width: 32, height: 32}}
                 />
-              </IconButton>
+              </IconButtonStatic>
             }
           >
             <MenuOption onSelect={() => {setMenuVisible(false)}}>
@@ -51,8 +68,14 @@ export default function HomeScreen() {
                 <Link href="/timer">Shop</Link>
               </ThemedText>
             </MenuOption>
+            <MenuOption onSelect={handleLogout}>
+              <ThemedText type="font_sm">
+                Logout
+              </ThemedText>
+            </MenuOption>
           </DropdownMenu>
         </SafeAreaView>
+        
         <Image
         source={require("../../assets/images/cat-transparent.png")}
         style={[styles.cat, {bottom: catPosition}]}
@@ -63,8 +86,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   cat: {
-    width: Math.min(500, width * 0.7),
-    height: Math.min(500, width * 0.7),
+    width: Math.min(500, width * 0.5),
+    height: Math.min(500, width * 0.5),
     position: 'absolute',
     alignSelf: "center"
   },
@@ -89,6 +112,6 @@ const styles = StyleSheet.create({
   timerDisplay: {
     position: "absolute",
     alignSelf: "center",
-    top: "23%"
+    top: "20%"
   }
 });

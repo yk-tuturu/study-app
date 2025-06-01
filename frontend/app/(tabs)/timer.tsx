@@ -1,27 +1,45 @@
 import {Text, View, StyleSheet, TouchableOpacity, Image} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, {useState} from "react"
+import React, {useState, useEffect} from "react"
 import { useRouter } from 'expo-router';
 import {Toggle} from "@/components/Toggle";
 import ThemedText from "@/components/ThemedText";
 import colors from "@/constants/Colors";
 
-import IconButton from "@/components/IconButton";
+import IconButton from "@/components/buttons/IconButton";
 import SubjectTag from "@/components/SubjectTag";
-import CircularButton from "@/components/CircularButton";
+import CircularButton from "@/components/buttons/CircularButton";
+import {useTimer} from "@/context/timerContext"
 
 export default function Timer() {
     const router = useRouter();
     const [timerOption, setTimerOption] = useState(0);
 
+    const [duration, setDuration] = useState(30);
+
+    const {startTimer} = useTimer();
+
+    function addDuration() {
+        setDuration(prev=> prev + 10);
+    }
+
+    function minusDuration() {
+        setDuration(prev=>Math.max(0, prev - 10));
+    }
+
     function updateTimerOption(index: number): void {
         setTimerOption(index);
+    }
+
+    function start() {
+        startTimer(duration * 60 * 1000);
+        router.push("./home")
     }
 
     return(
         <View style={styles.container}>
             <SafeAreaView style={styles.uiContainer}>
-                <TouchableOpacity onPress={()=> {router.push("./home")}}>
+                <TouchableOpacity onPress={()=> {router.push("./")}}>
                     <Image
                         source={require("../../assets/images/close.png")}
                         style={styles.closeButton}
@@ -44,14 +62,16 @@ export default function Timer() {
                     style={{marginBottom: 28}}
                 ></Toggle>
                 <View style={styles.timerDiv}>
-                    <IconButton>
+                    <IconButton onPress={minusDuration}>
                         <Image
                             source={require("../../assets/images/minus.png")}
                             style={styles.timerButton}
                         />
                     </IconButton>
-                    <ThemedText type="font_xxl" style={{marginHorizontal: 16}}>30:00</ThemedText>
-                    <IconButton>
+                    <ThemedText type="font_xxl" style={{marginHorizontal: 16, fontSize: 100}}>
+                        {String(duration).padStart(2, '0') + ":00"}
+                    </ThemedText>
+                    <IconButton onPress={addDuration}>
                         <Image
                             source={require("../../assets/images/add.png")}
                             style={styles.timerButton}
@@ -84,7 +104,7 @@ export default function Timer() {
                         <ThemedText type="subtitle">CS1101Sasa</ThemedText>
                     </SubjectTag>
                 </View>
-                <CircularButton style={styles.playButton}>
+                <CircularButton style={styles.playButton} onPress={start}>
                     <Image
                         source={require("../../assets/images/play.png")}
                         style={styles.playButtonImage}

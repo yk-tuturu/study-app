@@ -1,14 +1,13 @@
-import {View, StyleSheet, Image, StyleProp, ViewStyle} from "react-native"
+import {View, StyleSheet, Image, StyleProp, ViewStyle, TouchableOpacity} from "react-native"
 import React from "react"
 import colors from "@/constants/Colors"
 
 interface Props {
     children?: React.ReactNode
-    onPress?: () => void
     style?: StyleProp<ViewStyle>
 }
 
-const IconButton: React.FC<Props> = ({children, onPress, style}) => {
+const IconButtonStatic: React.FC<Props> = ({children, style}) => {
     return (
         <View style={[styles.button, style]}>
             {children}
@@ -30,4 +29,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default IconButton;
+export default IconButtonStatic;

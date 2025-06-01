@@ -1,14 +1,16 @@
 import jwt from "jsonwebtoken"
 
 const authMiddleware = async (req, res, next) => {
-    const {token} = req.headers;
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+    
     if (!token) {
         return res.json({success:false, message:"Not Authorised. Please login to your account"})
     }
 
     try {
         const token_decode = jwt.verify(token, process.env.JWT_SECRET); 
-        res.body.userId = token_decode.id; 
+        req.userID = token_decode.id; 
         next(); 
     }
     catch (error) {

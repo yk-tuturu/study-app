@@ -6,6 +6,7 @@
 
 const colors = {
   bg: "#FBD4B0",
+  lightBg: "#FFEFD7",
   primary: "#C69363",
   accent: "#6C3705"
 };

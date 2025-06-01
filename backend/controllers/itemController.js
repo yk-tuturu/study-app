@@ -1,5 +1,5 @@
 import itemModel from "../models/itemModel.js";
-import userModel from "./models/userModel"; 
+import userModel from "../models/userModel.js"; 
 import mongoose from "mongoose";
 
 const addItem = async (req, res) => {

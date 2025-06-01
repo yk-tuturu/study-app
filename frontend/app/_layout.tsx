@@ -5,6 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { TimerProvider } from '@/context/timerContext';
+import {AuthProvider} from "@/context/authContext"
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -19,13 +21,18 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <AuthProvider>
+      <TimerProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{headerShown: false}} />
+        <Stack.Screen name="register" options={{headerShown: false}} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </>
+    </TimerProvider>
+    </AuthProvider>
+    
       
   );
 }
