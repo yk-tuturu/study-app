@@ -5,7 +5,7 @@ import colors from '@/constants/Colors';
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'font_xs' | 'font_sm' | 'font_md' | 'font_lg' | 'font_xl' | "font_xxl" | "subtitle";
+  type?: 'default' | 'font_xs' | 'font_sm' | 'font_md' | 'font_lg' | 'font_xl' | "font_xxl" | "subtitle" | "error";
 };
 
 function ThemedText({
@@ -19,6 +19,7 @@ function ThemedText({
   return (
     <Text
       style={[
+        {color: colors.accent},
         type === 'default' ? styles.default : undefined,
         type === 'font_xs' ? styles.font_xs : undefined,
         type === 'font_sm' ? styles.font_sm : undefined,
@@ -27,8 +28,9 @@ function ThemedText({
         type === 'font_xl' ? styles.font_xl : undefined,
         type === 'font_xxl' ? styles.font_xxl : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
+        type === "error" ? styles.error : undefined,
         style,
-        {color: colors.accent}
+        
       ]}
       {...rest}
     />
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
   },
   font_md: {
     fontSize: 32,
-    lineHeight: 32,
+    lineHeight: 40,
     fontFamily: "JockeyOne"
   },
   font_lg: {
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
   },
   font_xl: {
     fontSize: 72,
-    lineHeight: 72,
+    lineHeight: 90,
     fontFamily: "JockeyOne"
   },
   font_xxl: {
@@ -72,6 +74,11 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16
+  }, 
+  error: {
+    fontSize: 16,
+    color: "rgb(184, 16, 16)",
+    lineHeight: 20
   }
 });
 

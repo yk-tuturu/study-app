@@ -2,8 +2,8 @@ import { Link, Stack } from 'expo-router';
 import { View, StyleSheet, SafeAreaView, TextInput, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import React, {useState} from "react"
 
-import ThemedText from '@/components/ThemedText';
-import StyledTextInput from '@/components/StyledTextInput';
+import ThemedText from '@/components/text/ThemedText';
+import StyledTextInput from '@/components/general/StyledTextInput';
 import colors from '@/constants/Colors';
 import TextButton from '@/components/buttons/TextButton';
 import { useAuth } from '@/context/authContext';
@@ -24,7 +24,7 @@ export default function Login() {
         try {
             const res = await login(inputs.email, inputs.password);
             if (res.success) {
-                router.push("./")
+                router.replace("/(tabs)")
             } else {
                 console.log(res.message)
             }

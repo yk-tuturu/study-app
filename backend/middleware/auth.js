@@ -5,7 +5,7 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
     
     if (!token) {
-        return res.json({success:false, message:"Not Authorised. Please login to your account"})
+        return res.status(400).json({success:false, message:"Not Authorised. Please login to your account"})
     }
 
     try {

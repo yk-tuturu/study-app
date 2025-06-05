@@ -14,13 +14,15 @@ type AuthContextType = {
     logout: ()=>Promise<void>;
     loading: boolean;
     isLoggedIn: boolean;
+    token: string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [token, setToken] = useState("");
 
     useEffect(()=> {
         restoreSession();
@@ -36,8 +38,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
             })
 
             await AsyncStorage.setItem('jwt', res.data.token);
+
             setIsLoggedIn(true);
+            setToken(res.data.token);
+
             return { success: true, message: "Registration success" };
+
         } catch(err) {
             const error = err as AxiosError;
             console.log(err)
@@ -56,13 +62,16 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
     }
 
     const restoreSession = async () => {
+        setLoading(true);
+
         const token = await AsyncStorage.getItem('jwt');
+        console.log(token)
         if (token) {
             try {
-                const res = await axios.get(`${config.BACKEND_URL}/api/user/getInfo`, {
-                headers: { Authorization: `Bearer ${token}` },
-                });
+                console.log("loggedIn")
                 setIsLoggedIn(true);
+                setToken(token)
+
             } catch(err) {
                 console.log("token error")
                 console.log(err)
@@ -75,8 +84,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
     const login = async(email: string, password: string) => {
         try {
             const res = await axios.post(`${config.BACKEND_URL}/api/user/login`, {email, password})
+
             await AsyncStorage.setItem('jwt', res.data.token);
+
             setIsLoggedIn(true);
+            setToken(res.data.token);
+
             return {success: true, message: "Login success"}
         } catch(err) {
             const error = err as AxiosError;
@@ -97,6 +110,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
     const logout = async() => {
         await AsyncStorage.removeItem('jwt');
         setIsLoggedIn(false)
+        setToken("")
     }
 
     return (
@@ -105,7 +119,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
             register,
             logout,
             loading, 
-            isLoggedIn
+            isLoggedIn,
+            token
          }}>
         {children}
         </AuthContext.Provider>

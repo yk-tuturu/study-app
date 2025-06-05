@@ -1,12 +1,14 @@
 import {View, StyleSheet, Image, StyleProp, ViewStyle, Dimensions} from "react-native";
-import React, {useEffect} from "react";
+import React, {useState} from "react";
 import { CircularProgress } from 'react-native-circular-progress';
 import colors from "@/constants/Colors";
-import ThemedText from "./ThemedText";
-import TextOutline from "./TextOutline";
+import ThemedText from "./text/ThemedText";
+import TextOutline from "./text/TextOutline";
 import IconButton from "./buttons/IconButton";
 
 import {useTimer} from "@/context/timerContext";
+import ThemedModal from "./general/ThemedModal";
+import TextButton from "./buttons/TextButton";
 
 interface Props {
     time: number
@@ -24,7 +26,9 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
     const paddedMins = String(mins).padStart(2, '0'); 
     const paddedSecs = String(secs).padStart(2, '0'); 
 
-    const {pauseTimer, unpauseTimer, getPaused} = useTimer();
+    const {pauseTimer, unpauseTimer, getPaused, endTimer} = useTimer();
+
+    const [showConfirmStopModal, setShowConfirmStopModal] = useState(false);
 
     function handlePause() {
         console.log("pausing");
@@ -34,6 +38,26 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
         } else {
             pauseTimer();
         }
+    }
+
+    function handleStop() {
+        pauseTimer();
+        setShowConfirmStopModal(true);
+    }
+
+    function dontStop() {
+        setShowConfirmStopModal(false);
+        unpauseTimer();
+    }
+
+    function hideModal() {
+        setShowConfirmStopModal(false);
+    }
+
+    function stopTimer() {
+        if (!getPaused()) return;
+        
+        endTimer()
     }
 
     return (
@@ -64,12 +88,25 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
                         <IconButton style={{marginHorizontal: 16}} onPress={handlePause}>
                         <Image source={require("../assets/images/pause.png")} style={styles.timerButton} />
                         </IconButton>
-                        <IconButton style={{marginHorizontal: 16}} onPress={() => console.log("stop")}>
+                        <IconButton style={{marginHorizontal: 16}} onPress={handleStop}>
                         <Image source={require("../assets/images/stop.png")} style={styles.timerButton} />
                         </IconButton>
                     </View>
                 </View>
             </View>
+            <ThemedModal
+                isVisible={showConfirmStopModal}
+                onDismiss={dontStop}
+                style={{marginHorizontal: 16}}
+                onModalHide={stopTimer}
+            >
+                <View style={{alignItems: "center", padding: 16}}>
+                    <ThemedText type="font_md">Confirm Stop?</ThemedText>
+                    <TextButton onPress={hideModal}>
+                        <ThemedText type="font_md">Yes</ThemedText>
+                    </TextButton>
+                </View>
+            </ThemedModal>
         </View>
     )
 }

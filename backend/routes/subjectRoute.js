@@ -1,10 +1,13 @@
 import express from "express"
-import { deleteSubject, newSubject, updateHours } from "../controllers/subjectController.js";
+import { deleteSubject, getAllSubjects, newSubject, updateMins, getSubjectDetails } from "../controllers/subjectController.js";
+import authMiddleware from "../middleware/auth.js";
 
 const subjectRouter = express.Router()
 
-subjectRouter.post('/new', newSubject)
-subjectRouter.post('/delete', deleteSubject)
-subjectRouter.post('/update', updateHours)
+subjectRouter.post('/new', authMiddleware, newSubject)
+subjectRouter.post('/delete', authMiddleware, deleteSubject)
+subjectRouter.post('/update', authMiddleware, updateMins)
+subjectRouter.get("/getAll", authMiddleware, getAllSubjects)
+subjectRouter.get("/get", authMiddleware, getSubjectDetails)
 
 export default subjectRouter; 

@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { TimerProvider } from '@/context/timerContext';
@@ -21,8 +22,9 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <TimerProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{headerShown: false}} />
@@ -30,8 +32,10 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </TimerProvider>
     </AuthProvider>
+    </SafeAreaProvider>
+      
+    
     
       
   );

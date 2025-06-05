@@ -1,23 +1,154 @@
-import {Text, View, StyleSheet, TouchableOpacity, Image} from "react-native";
+import {View, StyleSheet, TouchableOpacity, Image, Modal, TouchableWithoutFeedback, Keyboard, ScrollView} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from "react"
 import { useRouter } from 'expo-router';
-import {Toggle} from "@/components/Toggle";
-import ThemedText from "@/components/ThemedText";
-import colors from "@/constants/Colors";
 
+import ThemedText from "@/components/text/ThemedText";
 import IconButton from "@/components/buttons/IconButton";
 import SubjectTag from "@/components/SubjectTag";
 import CircularButton from "@/components/buttons/CircularButton";
-import {useTimer} from "@/context/timerContext"
+import ThemedModal from "@/components/general/ThemedModal";
+import StyledTextInput from "@/components/general/StyledTextInput";
+import SubjectColor from "@/components/SubjectColor";
+import {Toggle} from "@/components/general/Toggle";
+import TextButton from "@/components/buttons/TextButton";
+
+import colors from "@/constants/Colors";
+import config from "@/config";
+
+import {useTimer} from "@/context/timerContext";
+import { useAuth } from "@/context/authContext";
+
+import axios, {Axios, AxiosError} from "axios";
+import { ParseError } from "@/util";
+
+type SubjectType = {
+    id: string,
+    name: string,
+    color: number
+}
 
 export default function Timer() {
-    const router = useRouter();
     const [timerOption, setTimerOption] = useState(0);
+    
+    const [subjects, setSubjects] = useState<SubjectType[]>([]);
 
-    const [duration, setDuration] = useState(30);
+    const [selectedSubject, setSelectedSubject] = useState(-1);
+    const [showSubjectModal, setShowSubjectModal] = useState(false);
+    const [newSubjectInput, setNewSubjectInput] = useState({
+        name: "",
+        color: -1
+    })
+    const [inputFocused, setInputFocused] = useState(false);
+    const [error, setError] = useState("");
+    
+    const [duration, setDuration] = useState(0.1);
 
     const {startTimer} = useTimer();
+    const {token, isLoggedIn} = useAuth();
+
+    const router = useRouter();
+
+    useEffect(()=> {
+        fetchSubjectInfo();
+    }, [])
+
+    const fetchSubjectInfo = async() => {
+        // not logged in (just a sanity check)
+        if (!isLoggedIn || !token) {
+            console.log("Authentication error")
+            router.push("./login")
+            return
+        }
+
+        console.log("fetching subjects")
+        
+        var prevSelectedSubjectId = ""
+        if (selectedSubject != -1) {
+            prevSelectedSubjectId = subjects[selectedSubject].id;
+            setSelectedSubject(-1);
+        }
+
+        // get all subjects under this user
+        try {
+            const res = await axios.get(`${config.BACKEND_URL}/api/subject/getAll`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+
+            const newSubjects = res.data.data.map((subject: any, index: number) => {
+                if (subject._id === prevSelectedSubjectId) {
+                    setSelectedSubject(index);
+                }
+
+                return {
+                    id: subject._id,
+                    name: subject.name,
+                    color: Math.max(subject.color, 0) // accidentally created a color of -1 in the backend one time, just a check for that
+                }
+            })
+
+            setSubjects(newSubjects);
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
+    // changes the selected subject
+    // we mark the selected subject by index, but this approach may not account for when the index changes, so this is lowkey kinda bad
+    // but comparing ids sounds a bit inefficient...
+    function handleSelectSubject(index: number) {
+        setSelectedSubject(index);
+    }
+
+    // close the new subject modal 
+    function handleCloseModal() {
+        if (inputFocused) {
+            Keyboard.dismiss()
+            return;
+        }
+
+        setShowSubjectModal(false);
+        setNewSubjectInput({
+            name: "",
+            color: -1
+        })
+        setError("");
+    }
+
+    // updates subject color in the new subject modal
+    function selectColor(index: number) {
+        setNewSubjectInput(prev => ({...prev, color: index}))
+    }
+
+    // axios request to create the new subject
+    const createNewSubject = async() => {
+        if (newSubjectInput.name === "") {
+            setError("Subject name cannot be empty")
+            return;
+        } 
+
+        if (newSubjectInput.color === -1) {
+            setError("A color must be selected")
+            return;
+        }
+        
+        try {
+            await axios.post(`${config.BACKEND_URL}/api/subject/new`, {
+                name: newSubjectInput.name,
+                color: newSubjectInput.color
+            }, {headers: {
+                Authorization: `Bearer: ${token}`
+            }})
+
+            await fetchSubjectInfo();
+            handleCloseModal();
+
+        } catch(err) {
+            console.log(ParseError(err as AxiosError));
+            setError(ParseError(err as AxiosError))
+        }
+        
+    }
 
     function addDuration() {
         setDuration(prev=> prev + 10);
@@ -27,13 +158,21 @@ export default function Timer() {
         setDuration(prev=>Math.max(0, prev - 10));
     }
 
+    // for the toggle that controls the timer mode: countdown and stopwatch, 
+    // but as of rn i havent actually implemented that yet so this just updates the toggle graphic
     function updateTimerOption(index: number): void {
         setTimerOption(index);
     }
 
+    // starts the timer and navs back to main page
     function start() {
-        startTimer(duration * 60 * 1000);
-        router.push("./home")
+        if (selectedSubject === -1) {
+            console.log("a subject must be selected"); // change this to some sort of notif later
+            return;
+        }
+
+        startTimer(duration * 60 * 1000, subjects[selectedSubject].id, subjects[selectedSubject].name);
+        router.push("./")
     }
 
     return(
@@ -88,21 +227,23 @@ export default function Timer() {
                     <ThemedText type="subtitle">Select your subject goal</ThemedText>
                 </View>
                 <View style={styles.subjectContainer}>
-                    <SubjectTag>
-                        <ThemedText type="subtitle">CS1101S</ThemedText>
-                    </SubjectTag>
-                    <SubjectTag>
-                        <ThemedText type="subtitle">CS1101S</ThemedText>
-                    </SubjectTag>
-                    <SubjectTag>
-                        <ThemedText type="subtitle">CS1101Sa</ThemedText>
-                    </SubjectTag>
-                    <SubjectTag>
-                        <ThemedText type="subtitle">CS1101S</ThemedText>
-                    </SubjectTag>
-                    <SubjectTag>
-                        <ThemedText type="subtitle">CS1101Sasa</ThemedText>
-                    </SubjectTag>
+                    {
+                        subjects.map((subject, index) => {
+                            return <SubjectTag
+                                key={index}
+                                name={subject.name}
+                                color={subject.color}
+                                onSelect={() => handleSelectSubject(index)}
+                                isSelected={selectedSubject === index}
+                            />
+                        })
+                    }
+                    <TouchableOpacity onPress={()=>setShowSubjectModal(true)} style={styles.subjectAddButton}>
+                        <Image
+                            source={require("../../assets/images/add.png")}
+                            style={{width: 16, height: 16}}
+                        />
+                    </TouchableOpacity>
                 </View>
                 <CircularButton style={styles.playButton} onPress={start}>
                     <Image
@@ -110,9 +251,46 @@ export default function Timer() {
                         style={styles.playButtonImage}
                     />
                 </CircularButton>
+                <ThemedModal 
+                    isVisible={showSubjectModal}
+                    onDismiss={handleCloseModal}
+                    style={{marginHorizontal: 20}}
+                >
+                    <View style={styles.subjectModalContainer}>
+                        <ThemedText type="font_md" style={{marginBottom: 16}}>New Subject</ThemedText>
+                        <ThemedText type="font_sm">Name</ThemedText>
+                        <StyledTextInput
+                            value={newSubjectInput.name}
+                            onChangeText={(e)=>setNewSubjectInput(prev=>({...prev, name: e}))}
+                            placeholder="Enter subject name"
+                            onFocus={()=>setInputFocused(true)}
+                            onBlur={()=>setInputFocused(false)}
+                            changeColor={false}
+                            style={{marginBottom: 16}}
+                        />
+                        <ThemedText type="font_sm" style={{marginBottom: 8}}>Select color</ThemedText>
+                        <View style={[styles.subjectContainer, {marginBottom: 32}]}>
+                            {colors.subjects.map((color, index) => {
+                                return (
+                                    <SubjectColor 
+                                        key={index}
+                                        colorType={index} 
+                                        selected={index===newSubjectInput.color}
+                                        onPress={()=>selectColor(index)}
+                                        style={{marginRight: 8, marginBottom: 8}}/>
+                                )
+                            })}
+                        </View>
+                        <ThemedText type="error">{error}</ThemedText>
+                        <TextButton onPress={createNewSubject}>
+                            <ThemedText type="font_md" style={{marginTop: 4}}>Create</ThemedText>
+                        </TextButton>
+                    </View>
+                    
+                </ThemedModal>
                 
             </SafeAreaView>
-        </View>
+        </View>     
     )
 }
 
@@ -175,5 +353,20 @@ const styles = StyleSheet.create({
     playButtonImage: {
         width: 48,
         height: 48
+    },
+    subjectAddButton: {
+        borderRadius: 8,
+        backgroundColor: colors.primary,
+        borderColor: colors.accent,
+        borderWidth: 2,
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 12,
+        paddingVertical: 4,
+        paddingHorizontal: 6
+    }, 
+    subjectModalContainer: {
+        padding: 8,
+        paddingTop: 16
     }
 })

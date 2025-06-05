@@ -2,7 +2,7 @@ import {View, StyleSheet, Image, Image as RNImage, Dimensions} from "react-nativ
 import React, {forwardRef, useEffect, useState} from "react"
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 const { width, height } = Dimensions.get('window');
@@ -21,7 +21,6 @@ const Background = forwardRef<RNImage, Props>(({ children }, ref) => {
                 ref={ref}
                 resizeMode="contain"
             />
-            {children}
         </View>
     )
 })
@@ -30,6 +29,12 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: "#F0C0BF",
         flex: 1,
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: -1,
+        position: "absolute"
     },
     ground: {
         backgroundColor: "#F6E5CB",

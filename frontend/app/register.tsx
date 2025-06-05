@@ -2,8 +2,8 @@ import { Link, Stack } from 'expo-router';
 import { View, StyleSheet, SafeAreaView, TextInput, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import React, {useState} from "react"
 
-import ThemedText from '@/components/ThemedText';
-import StyledTextInput from '@/components/StyledTextInput';
+import ThemedText from '@/components/text/ThemedText';
+import StyledTextInput from '@/components/general/StyledTextInput';
 import colors from '@/constants/Colors';
 import TextButton from '@/components/buttons/TextButton';
 import { useAuth } from '@/context/authContext';
@@ -25,7 +25,7 @@ export default function Register() {
       try {
         const res = await register(inputs.name, inputs.email, inputs.password, inputs.confirmPassword);
         if (res.success) {
-          router.push("./")
+          router.replace("./(tabs)/") // redirect to home page
         } else {
           console.log(res.message)
         }

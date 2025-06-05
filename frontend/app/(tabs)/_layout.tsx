@@ -1,29 +1,36 @@
 import { Tabs, Slot } from 'expo-router';
-import React from 'react';
-import { Platform, View, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
-import {Redirect} from 'expo-router'
+import React, {useEffect} from 'react';
+import { Platform, View, StyleSheet, ActivityIndicator} from 'react-native';
+import {Redirect, Stack} from 'expo-router'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
+import { HapticTab } from '@/components/template/HapticTab';
+import { IconSymbol } from '@/components/template/ui/IconSymbol';
+import TabBarBackground from '@/components/template/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import {useAuth} from "@/context/authContext"
+import { useRouter } from 'expo-router';
+import { TimerProvider } from '@/context/timerContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   const {loading, isLoggedIn} = useAuth();
 
-  if (loading) {
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      router.replace('/login');
+    }
+  }, [loading, isLoggedIn]);
+
+  if (loading || !isLoggedIn) {
     return (
       <SafeAreaView>
-        <ActivityIndicator size="large"/>
+        <ActivityIndicator size="large" />
       </SafeAreaView>
-    )
-  }
-
-  if (!isLoggedIn) {
-    return <Redirect href="/login"></Redirect>
+    );
   }
 
   return (
@@ -56,14 +63,16 @@ export default function TabLayout() {
     //     }}
     //   />
     // </Tabs>
+    <TimerProvider>
+      <Stack>
+        <Stack.Screen name="index" options={{headerShown: false}} />
+        <Stack.Screen name="timer" options={{headerShown: false}} />
+        <Stack.Screen name="shop" options={{headerShown: false}} />
+      </Stack>
+    </TimerProvider>
+      
     
-
-    <View style={styles.container}>
-      <Slot/>
-    </View>
   );
-
-  
 }
 
 const styles = StyleSheet.create({
