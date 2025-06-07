@@ -29,7 +29,8 @@ type SubjectType = {
 }
 
 export default function Timer() {
-    const [timerOption, setTimerOption] = useState(0);
+    // this is for when i originally wanted two timer modes: countdown and stopwatch, but I gave up
+    const [timerOption, setTimerOption] = useState(0); 
     
     const [subjects, setSubjects] = useState<SubjectType[]>([]);
 
@@ -42,7 +43,7 @@ export default function Timer() {
     const [inputFocused, setInputFocused] = useState(false);
     const [error, setError] = useState("");
     
-    const [duration, setDuration] = useState(0.1);
+    const [duration, setDuration] = useState(1);
 
     const {startTimer} = useTimer();
     const {token, isLoggedIn} = useAuth();
@@ -63,6 +64,7 @@ export default function Timer() {
 
         console.log("fetching subjects")
         
+        // if there was previously a subject selected, maintain the selection
         var prevSelectedSubjectId = ""
         if (selectedSubject != -1) {
             prevSelectedSubjectId = subjects[selectedSubject].id;

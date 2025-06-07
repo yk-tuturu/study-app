@@ -34,22 +34,35 @@ const Cat: React.FC<Props> = ({bottomPosition}) => {
             };
       });
 
+    // starts the anim
     useEffect(()=> {
         tweenCat();
     }, [])
 
     return (
+        <>
         <Animated.Image
-        source={require("../assets/images/cat-transparent.png")}
-        style={[styles.cat, animatedStyle, {bottom: bottomPosition}]}
+        source={require("../assets/images/cat.png")}
+        style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 0}]}
         />
+        <Animated.Image
+        source={require("../assets/images/ribbon.png")}
+        style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}
+        />
+        <Animated.Image
+        source={require("../assets/images/suit.png")}
+        style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}
+        />
+        </>
+        
+
     )
 }
 
 const styles = StyleSheet.create({
     cat: {
-        width: Math.min(500, width * 0.6),
-        height: Math.min(500, width * 0.6) / 264 * 235,
+        width: Math.min(700, width * 0.7),
+        height: Math.min(700, width * 0.7) / 264 * 235,
         position: 'absolute',
         alignSelf: "center",
         resizeMode: "cover"

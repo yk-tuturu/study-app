@@ -16,18 +16,23 @@ import { useAuth } from '@/context/authContext';
 import { useRouter } from 'expo-router';
 import TextButton from '@/components/buttons/TextButton';
 
+import axios, { AxiosError } from 'axios';
+import config from '@/config';
+import { ParseError } from '@/util';
+
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [catPosition, setCatPosition] = useState(0);
+  const [coins, setCoins] = useState(0);
   const rugRef = useRef<RNImage>(null)
 
   const { remaining, isRunning, isEnded, endStats, getDuration, clearTimer, getCurrentSubject} = useTimer();
 
   const [showStatsModal, setShowStatsModal] = useState(false);
 
-  const {logout} = useAuth();
+  const {logout, token} = useAuth();
   
   const router = useRouter();
 
@@ -35,7 +40,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (rugRef.current) {
       rugRef.current.measure((fx, fy, imageWidth, imageHeight, px, py) => {
-        setCatPosition(height - py - imageHeight * 0.4)
+        setCatPosition(height - py - imageHeight * 0.5)
       });
     }
   }, [rugRef]);
@@ -45,6 +50,25 @@ export default function HomeScreen() {
       setShowStatsModal(true);
     }
   }, [isEnded, isRunning])
+
+  useEffect(()=> {
+    fetchCoins()
+  }, [token, isRunning])
+
+  const fetchCoins = async() => {
+    try {
+      const res = await axios.get(`${config.BACKEND_URL}/api/user/getInfo`, {
+        headers: {
+          Authorization: `Bearer: ${token}`
+        }
+      })
+
+      setCoins(res.data.data.coins)
+    } catch(err) {
+      console.log(ParseError(err as AxiosError));
+    }
+    
+  }
 
   const dismissStatsModal = () => {
     clearTimer();
@@ -73,14 +97,22 @@ export default function HomeScreen() {
           </IconButtonStatic>
         }
       >
-        <MenuOption onSelect={() => {setMenuVisible(false)}}>
-          <ThemedText type="font_sm">
-            <Link href="/timer">Timer</Link>
+        <MenuOption onSelect={() => {
+          router.push("/(tabs)/timer");
+          setMenuVisible(false);
+        }}>
+          <View>
+            <ThemedText type="font_sm">
+            Timer
           </ThemedText>
+          </View>
+          
         </MenuOption>
-        <MenuOption onSelect={() => {setMenuVisible(false);}}>
+        <MenuOption onSelect={() => {
+          router.push("/(tabs)/shop");
+          setMenuVisible(false);}}>
           <ThemedText type="font_sm">
-            <Link href="/timer">Shop</Link>
+            Shop
           </ThemedText>
         </MenuOption>
         <MenuOption onSelect={handleLogout}>
@@ -89,7 +121,16 @@ export default function HomeScreen() {
           </ThemedText>
         </MenuOption>
       </DropdownMenu>
+
       <Cat bottomPosition={catPosition}/>
+
+      <View style={styles.coinPanel}>
+          <Image
+            source={require("../../assets/images/coin.png")}
+            style={{width: 32, height: 32, marginRight: 8}}
+          />
+          <ThemedText type="font_md">{coins}</ThemedText>
+      </View>
       <ThemedModal
         isVisible={showStatsModal}
         onDismiss={dismissStatsModal}
@@ -99,8 +140,9 @@ export default function HomeScreen() {
         <ThemedText type="font_lg" style={{fontSize: 42}}>Finished Session</ThemedText>
         <View style={{alignItems: "center", marginBottom: 16}}>
           <ThemedText type="font_sm">Time spent: {endStats.currentTime} mins</ThemedText>
-          <ThemedText type="font_sm">Time spent on {getCurrentSubject().name}: {endStats.totalTime} mins</ThemedText>
-          <ThemedText type="font_sm">Coins earned: {Math.floor(endStats.currentTime / 5)}</ThemedText>
+          <ThemedText type="font_sm">Time spent on {getCurrentSubject().name}:</ThemedText>
+          <ThemedText type="font_sm">{endStats.totalTime} mins</ThemedText>
+          <ThemedText type="font_sm">Coins earned: {endStats.coinAmount}</ThemedText>
         </View>
         
         <TextButton onPress={dismissStatsModal}>
@@ -136,5 +178,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignSelf: "center",
     top: "20%"
+  },
+  coinPanel: {
+    position: "absolute",
+    bottom: 30,
+    left: 15,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
   }
 });

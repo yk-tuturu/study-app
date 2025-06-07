@@ -8,6 +8,7 @@ interface Props {
     style?: StyleProp<ViewStyle>
 }
 
+// this is a dumbass hack because APPARENTLY YOU CANT DO TEXT OUTLINES IN REACT NATIVE WHO MADE THIS SHIT
 const TextOutline: React.FC<Props> = ({
     stroke,
     color,

@@ -194,13 +194,14 @@ const getAccessories = async (req, res) => {
 
 // add coins after finishing a study session
 const addCoins = async (req, res) => {
-    const { userID, coinAmount } = req.body; 
+    const { coinAmount } = req.body; 
+    const {userID} = req;
 
-    if (!userID || !coinAmount) {
-        return res.status(400).json({success: false, message: "Invalid input: userID and coin amount are required."});
+    if (!userID) {
+        return res.status(400).json({success: false, message: "Invalid input: userID is required."});
     }
 
-    if (typeof coinAmount !== 'number' || coinAmount <= 0) {
+    if (typeof coinAmount !== 'number' || coinAmount < 0) {
         return res.status(400).json({ success: false, message: "Invalid input: coin amount must be a positive number." });
     }
 

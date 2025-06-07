@@ -9,6 +9,7 @@ import { ParseError } from '@/util';
 type EndStatsType = {
     currentTime: number,
     totalTime: number,
+    coinAmount: number
 }
 
 type SubjectInfoType = {
@@ -38,18 +39,18 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [isRunning, setIsRunning] = useState(false);
     const [remaining, setRemaining] = useState(0);
 
-    const [isEnded, setIsEnded] = useState(false);
+    const [isEnded, setIsEnded] = useState(false); // when this is true, show the modal that appears at the end of the timer
     const [endStats, setEndStats] = useState<EndStatsType>({
         currentTime: 0,
         totalTime: 0,
-    })
+        coinAmount: 0
+    }) 
     
+    const animationFrameRef = useRef<number | null>(null); 
+    const elapsedRef = useRef(0); // time elapsed 
 
-    const animationFrameRef = useRef<number | null>(null);
-    const elapsedRef = useRef(0);
-
-    const durationRef = useRef<number>(0);
-    const pausedRef = useRef<boolean>(false);
+    const durationRef = useRef<number>(0); // the total duration that the timer is set to countdown
+    const pausedRef = useRef<boolean>(false); 
     const subjectRef = useRef<SubjectInfoType>({
         id: "",
         name: ""
@@ -58,51 +59,6 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const {token} = useAuth()
 
     const prevFrameRef = useRef<number>(0); // used to calculate delta time per frame
-
-    const submitTime = async(mins: number) => {
-        try {
-            const res = await axios.post(`${config.BACKEND_URL}/api/subject/update`, {
-                subjectId: subjectRef.current.id,
-                mins: Math.max(1, mins) // clamp min of 1 for testing, since i often use a 0.1 min timer for testing
-            }, {headers: {
-                Authorization: `Bearer: ${token}`
-            }})
-
-            if (!res.data.data) {
-                console.log("Something went wrong");
-            }
-
-            setEndStats({
-                currentTime: mins,
-                totalTime: res.data.data.totalMins,
-            })
-
-            setIsEnded(true);
-            
-        } catch(err) {
-            console.log("error")
-            console.log(ParseError(err as AxiosError))
-        }
-    }
-
-    // resets all the variables after the timer is run out and the end modal is dismissed
-    const clearTimer = useCallback(()=> {
-        setIsEnded(false);
-        setIsRunning(false);
-        setRemaining(0);
-        setEndStats({
-            currentTime: 0,
-            totalTime: 0
-        });
-
-        pausedRef.current = false;
-        durationRef.current = 0;
-        elapsedRef.current = 0;
-        subjectRef.current = {
-            id: "",
-            name: ""
-        }
-    }, [])
 
     const updateRemaining = () => {
         if (pausedRef.current) {
@@ -145,6 +101,59 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     }, [isRunning, updateRemaining])
 
+    // called when timer ends 
+    // submits results to backend
+    const submitTime = async(mins: number) => {
+        try {
+            const res = await axios.post(`${config.BACKEND_URL}/api/subject/update`, {
+                subjectId: subjectRef.current.id,
+                mins: Math.max(1, mins) // clamp min of 1 for testing, since i often use a 0.1 min timer for testing
+            }, {headers: {
+                Authorization: `Bearer: ${token}`
+            }})
+
+            const coinRes = await axios.post(`${config.BACKEND_URL}/api/user/addCoins`, {
+                coinAmount: Math.max(Math.floor(mins / 5), 1)
+            }, {headers: {
+                Authorization: `Bearer: ${token}`
+            }})
+
+            setEndStats({
+                currentTime: mins,
+                totalTime: res.data?.data?.totalMins,
+                coinAmount: Math.floor(mins / 5)
+            })
+
+            setIsEnded(true);
+            
+        } catch(err) {
+            console.log("error")
+            console.log(ParseError(err as AxiosError))
+        }
+    }
+
+    // resets all the variables after the timer is run out and the end modal is dismissed
+    const clearTimer = useCallback(()=> {
+        setIsEnded(false);
+        setIsRunning(false);
+        setRemaining(0);
+        setEndStats({
+            currentTime: 0,
+            totalTime: 0,
+            coinAmount: 0
+        });
+
+        pausedRef.current = false;
+        durationRef.current = 0;
+        elapsedRef.current = 0;
+        subjectRef.current = {
+            id: "",
+            name: ""
+        }
+    }, [])
+
+    
+
     const pauseTimer = useCallback(()=> {
         pausedRef.current = true
     }, [])
@@ -152,7 +161,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const unpauseTimer = useCallback(()=>{
         pausedRef.current = false
     }, [])
-
+    
+    // for the stop button when the timer is terminated early
     const endTimer = useCallback(async()=>{
         if (animationFrameRef.current !== null) {
             cancelAnimationFrame(animationFrameRef.current);
