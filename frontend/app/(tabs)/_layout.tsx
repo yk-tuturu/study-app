@@ -68,6 +68,7 @@ export default function TabLayout() {
         <Stack.Screen name="index" options={{headerShown: false}} />
         <Stack.Screen name="timer" options={{headerShown: false}} />
         <Stack.Screen name="shop" options={{headerShown: false}} />
+        <Stack.Screen name="decorate" options={{headerShown: false}} />
       </Stack>
     </TimerProvider>
       

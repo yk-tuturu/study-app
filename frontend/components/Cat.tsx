@@ -2,13 +2,16 @@ import {View, Image, StyleSheet, Dimensions} from "react-native"
 import React, {useEffect} from "react"
 import Animated, { useSharedValue, withSequence, withTiming, withRepeat, useAnimatedStyle } from 'react-native-reanimated';
 
+import SpriteMap from "@/constants/Sprites";
+
 const { width, height } = Dimensions.get('window');
 
 type Props = {
-    bottomPosition: number
+    bottomPosition: number,
+    accessories: string[]
 }
 
-const Cat: React.FC<Props> = ({bottomPosition}) => {
+const Cat: React.FC<Props> = ({bottomPosition, accessories}) => {
     const scaleY = useSharedValue(1.1);
     const TIME = 1500;
 
@@ -22,17 +25,17 @@ const Cat: React.FC<Props> = ({bottomPosition}) => {
         ), -1, true)
     }
     
-      const animatedStyle = useAnimatedStyle(() => {
-            const scale = scaleY.value;
-            const translateY = (1 - scale) * catHeight / 2; // Adjust based on scaling
+    const animatedStyle = useAnimatedStyle(() => {
+        const scale = scaleY.value;
+        const translateY = (1 - scale) * catHeight / 2; // Adjust based on scaling
 
-            return {
-                transform: [
-                    { translateY },
-                    { scaleY: scale }
-                ]
-            };
-      });
+        return {
+            transform: [
+                { translateY },
+                { scaleY: scale }
+            ]
+        };
+    });
 
     // starts the anim
     useEffect(()=> {
@@ -45,14 +48,17 @@ const Cat: React.FC<Props> = ({bottomPosition}) => {
         source={require("../assets/images/cat.png")}
         style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 0}]}
         />
-        <Animated.Image
-        source={require("../assets/images/ribbon.png")}
-        style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}
-        />
-        <Animated.Image
-        source={require("../assets/images/suit.png")}
-        style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}
-        />
+        {
+            accessories.map((filename, index) => {
+                return (
+                    <Animated.Image
+                    key={index}
+                    source={SpriteMap[filename]}
+                    style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}
+                    />
+                )
+            })
+        }
         </>
         
 

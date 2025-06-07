@@ -9,6 +9,7 @@ const colors = {
   lightBg: "#FFEFD7",
   primary: "#C69363",
   accent: "#6C3705",
+  accent_lighter: "#6C3705",
   subjects: [
     {
       main: "#F99C9C",

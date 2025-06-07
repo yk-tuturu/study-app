@@ -43,7 +43,7 @@ export default function HomeScreen() {
         setCatPosition(height - py - imageHeight * 0.5)
       });
     }
-  }, [rugRef]);
+  }, [rugRef.current]);
 
   useEffect(()=> {
     if (isRunning && isEnded) {
@@ -109,6 +109,13 @@ export default function HomeScreen() {
           
         </MenuOption>
         <MenuOption onSelect={() => {
+          router.push("/(tabs)/decorate");
+          setMenuVisible(false);}}>
+          <ThemedText type="font_sm">
+            Decorate
+          </ThemedText>
+        </MenuOption>
+        <MenuOption onSelect={() => {
           router.push("/(tabs)/shop");
           setMenuVisible(false);}}>
           <ThemedText type="font_sm">
@@ -122,7 +129,7 @@ export default function HomeScreen() {
         </MenuOption>
       </DropdownMenu>
 
-      <Cat bottomPosition={catPosition}/>
+      <Cat bottomPosition={catPosition} accessories={["ribbon", "suit"]}/>
 
       <View style={styles.coinPanel}>
           <Image
