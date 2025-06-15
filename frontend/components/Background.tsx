@@ -1,25 +1,46 @@
-import {View, StyleSheet, Image, Image as RNImage, Dimensions} from "react-native"
-import React, {forwardRef, useEffect, useState} from "react"
+import {View, StyleSheet, Dimensions, LayoutChangeEvent} from "react-native"
+import React, {forwardRef, useEffect, useState, useImperativeHandle} from "react"
+
+import { Image as ExpoImage } from "expo-image"; 
+import type { Image as ExpoImageType } from "expo-image";
+
 
 type Props = {
   children?: React.ReactNode;
 };
 
+export type RugRef = {
+  getLayout: () => { y: number; height: number };
+};
+
 const { width, height } = Dimensions.get('window');
 
-const Background = forwardRef<RNImage, Props>(({ children }, ref) => {
+const Background = forwardRef<RugRef, Props>(({ children }, ref) => {
+    const [rugPos, setRugPos] = useState({ y: 0, height: 0 });
+
+    const handleLayout = (event: LayoutChangeEvent) => {
+        const { y, height } = event.nativeEvent.layout;
+        setRugPos({ y, height });
+        console.log('Image position:', { y, height });
+    };
+
+    useImperativeHandle(ref, () => ({
+        getLayout: () => rugPos,
+    }));
+
+
     return (
         <View style={styles.container}>
             <View style={styles.ground}></View>
-            <Image
+            <ExpoImage
                 source={require("../assets/images/window.png")}
                 style={styles.window}
             />
-            <Image
+            <ExpoImage
                 source={require("../assets/images/rug.png")}
                 style={styles.rug}
-                ref={ref}
-                resizeMode="contain"
+                onLayout={handleLayout}
+                contentFit="contain"
             />
         </View>
     )

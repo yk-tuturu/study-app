@@ -1,7 +1,8 @@
-import { Platform, StyleSheet, View, Dimensions, Text, ImageBackground, Image, LayoutChangeEvent, TouchableOpacity} from 'react-native';
+import { Platform, StyleSheet, View, Dimensions, Text, ImageBackground, LayoutChangeEvent, TouchableOpacity} from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Link} from "expo-router"
+import { Image } from 'expo-image';
 
 import {MenuOption, DropdownMenu} from '@/components/general/Dropdown';
 import Background from "@/components/Background";
@@ -24,30 +25,42 @@ import AccessoryIcon from '@/components/AccessoryIcon';
 
 const { width, height } = Dimensions.get('window');
 
+// type Accessory = {
+//   type: string,
+//   filename: string,
+//   equipped: boolean
+// }
+
+const ACCESSORY_TYPES = ["head", "body"] as const;
+
+type AccessoryType = typeof ACCESSORY_TYPES[number];
+
 type Accessory = {
+  filename: string;
+  type: AccessoryType;
+};
+
+type EquippedAccessories = {
+  [key in AccessoryType]?: Accessory; // Optional per slot
+};
+
+type APIData = {
+  name: string, 
   type: string,
-  filename: string,
-  equipped: boolean
+  description: string,
+  price: number
 }
 
 export default function Decorate() {
   const [catPosition, setCatPosition] = useState(0);
 
-  const [accessories, setAccessories] = useState<Accessory[]>([
-    {
-      type: "head",
-      filename: "ribbon",
-      equipped: false
-    },
-    {
-      type: "body",
-      filename: "suit",
-      equipped: false
-    }
-  ])
+  const [accessories, setAccessories] = useState<Accessory[]>([])
+  const [equipped, setEquipped] = useState<EquippedAccessories>({
+    head: undefined,
+    body: undefined
+  })
 
-  const [currentType, setCurrentType] = useState<string>("head");
-  const types = ["Head", "Body"]
+  const [currentType, setCurrentType] = useState<AccessoryType>("head");
 
   const rugRef = useRef<Image>(null)
 
@@ -55,12 +68,44 @@ export default function Decorate() {
   
   const router = useRouter();
 
-  const equipAccessory = (filename: string) => {
-    setAccessories(prev => prev.map(acc=>acc.filename===filename ? {...acc, equipped: !acc.equipped} : acc));
+  useEffect(()=> {
+    fetchData();
+  }, [])
+
+  const fetchData = async() => {
+    try {
+      const res = await axios.get(`${config.BACKEND_URL}/api/item/listAll`, {headers: {Authorization: `Bearer: ${token}`}})
+      const data = res.data.data; 
+
+      setAccessories(data.map((acc: APIData)=>{
+        return {
+          type: acc.type,
+          filename: acc.name,
+          // equipped: false 
+        }
+      }))
+    } catch(err) {
+      console.log(err)
+      console.log(ParseError(err as AxiosError))
+    }
+  }
+
+  const toggleEquipped = (item: Accessory) => {
+    if (equipped[item.type]?.filename === item.filename) {
+      setEquipped((prev)=>({
+        ...prev,
+        [item.type]: undefined
+      }))
+    } else {
+        setEquipped((prev)=>({
+        ...prev,
+        [item.type]: item
+      }))
+    }
   }
   
-  const updateDisplayedType = (type: string) => {
-    setCurrentType(type.toLowerCase());
+  const updateDisplayedType = (type: AccessoryType) => {
+    setCurrentType(type);
   }
 
   const handleRugLayout = (event: LayoutChangeEvent) => {
@@ -87,18 +132,19 @@ export default function Decorate() {
         onLayout={handleRugLayout}
         resizeMode="contain"
       />
-      <Cat bottomPosition={catPosition} accessories={accessories.filter(a => a.equipped && a.filename !== undefined).map(a => a.filename as string)}/>
+      <Cat bottomPosition={catPosition} accessories={Object.values(equipped).filter(
+        (item): item is Accessory => item !== undefined
+      ).map(a => a.filename)}/>
       <View style={styles.panel}>
         <View style={styles.sidebar}>
           {
-            types.map((type, index) => {
+            ACCESSORY_TYPES.map((type, index) => {
               return (
                 <TouchableOpacity key={index} onPress={() => updateDisplayedType(type)}>
                   <View style={styles.sidebarButton}>
-                    <ThemedText type="font_sm">{type}</ThemedText>
+                    <ThemedText type="font_sm">{type.charAt(0).toUpperCase() + type.slice(1)}</ThemedText>
                   </View>
                 </TouchableOpacity>
-                
               )
             })
           }
@@ -110,15 +156,15 @@ export default function Decorate() {
                 <AccessoryIcon
                   key={index}
                   filename={acc.filename}
-                  onSelect={()=>equipAccessory(acc.filename)}
-                  isSelected={acc.equipped}
+                  onSelect={()=>toggleEquipped(acc)}
+                  isSelected={equipped[acc.type]?.filename === acc.filename}
                 />
               )
             })
           }
         </View>
       </View>
-      <TouchableOpacity onPress={()=>router.navigate("/(tabs)")}>
+      <TouchableOpacity onPress={()=>router.push("/(tabs)")}>
         <View style={styles.backButton}>
           <Image
             source={require("../../assets/images/back.png")}

@@ -4,12 +4,14 @@ The few main pages that are mostly done is index.tsx, timer.tsx, and login/regis
 decorate.tsx is halfway there
 I already made a test login account under tuturu@gmail.com, password: 12345678
 
+If you want to run the frontend together with the backend, make sure you go to config.ts and update the url there. replace the ip address with the ip address of your own computer. this thing is just there so that i can run the app on an external device (ie a physical phone)
+
 features added: 
 - login/signup
 - the timer system (but for now the timer just continues running when you put the app in the background)
 - the timer can be paused or terminated early 
 - you can add subjects and select the corresponding subject to study for 
-- basic decorating ui is up, but all the values are hardcoded so far, need to connect to backend
+- basic decorating ui is up, but all the values are hardcoded so far, need to connect to backend, index page also doesnt reflect your equipped accessories
 
 TODO: 
 - make the decorate page actually connect to the backend
@@ -17,7 +19,8 @@ TODO:
 - make transactions 
 - make timer track if you've left the app
 - fix the modal flashing issue
-- images load very slowly, not sure why yet
+- make sure to replace all instances of <Image> imported from react-native with the expo-image version
+- downscale all the mini icons, we deffo don't need them that big
 - (optional) make it so that the app is usable on a guest account? so you automatically make a guest account for new users instead of forcing them to log in
 - (very optional) being able to decorate the room would be nice
 
