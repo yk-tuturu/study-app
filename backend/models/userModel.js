@@ -9,9 +9,7 @@ const userSchema = new mongoose.Schema({
     pet: {
         wearing:  {
     head: { type: mongoose.Schema.Types.ObjectId, ref: 'item' },
-    neck: { type: mongoose.Schema.Types.ObjectId, ref: 'item' },
     body: { type: mongoose.Schema.Types.ObjectId, ref: 'item' },
-    tail: { type: mongoose.Schema.Types.ObjectId, ref: 'item' }
   }
       }
 }, {minimize:false}) 

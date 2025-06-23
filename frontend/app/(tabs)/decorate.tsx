@@ -32,32 +32,42 @@ type Accessory = {
 
 export default function Decorate() {
   const [catPosition, setCatPosition] = useState(0);
-
-  const [accessories, setAccessories] = useState<Accessory[]>([
-    {
-      type: "head",
-      filename: "ribbon",
-      equipped: false
-    },
-    {
-      type: "body",
-      filename: "suit",
-      equipped: false
-    }
-  ])
-
+  const [accessories, setAccessories] = useState<Accessory[]>([])
   const [currentType, setCurrentType] = useState<string>("head");
   const types = ["Head", "Body"]
-
   const rugRef = useRef<Image>(null)
-
   const {token} = useAuth();
-  
   const router = useRouter();
 
-  const equipAccessory = (filename: string) => {
-    setAccessories(prev => prev.map(acc=>acc.filename===filename ? {...acc, equipped: !acc.equipped} : acc));
-  }
+  const fetchAccessories = async () => {
+    try {
+      const res = await axios.get(`${config.BACKEND_URL}/api/user/ownedAccessories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAccessories(res.data.data);
+    } catch (err) {
+      console.log("error fetching owned accessories");
+    }
+  };
+
+  useEffect(() => {
+    fetchAccessories();
+  }, [token]);
+
+  const equipAccessory = async (filename: string) => {
+    setAccessories(prev => 
+      prev.map(acc => acc.filename === filename ? {...acc, equipped: !acc.equipped} : acc)
+    );
+    try {
+      await axios.post(`${config.BACKEND_URL}/item/wear`, { filename }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error("Failed to sync accessory with backend", err);
+    }
+  };
   
   const updateDisplayedType = (type: string) => {
     setCurrentType(type.toLowerCase());
@@ -189,6 +199,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     left: "3%"
-
   }
 });

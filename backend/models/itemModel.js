@@ -1,11 +1,12 @@
 import mongoose from "mongoose"
 
-const sessionSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
-    subjectId: { type: mongoose.Schema.Types.ObjectId, ref: 'subject', required: true }, 
-    duration: { type: Number, required: true },
-    date: { type: Date, default: Date.now } 
-});
+const itemSchema = new mongoose.Schema({
+    name: {type:String,required:true},
+    type: {type: String, required:true}, 
+    price: {type:Number,required:true},
+    image: {type: String, required:true},
+    description: {type: String, required: true}
+})
 
-const sessionModel = mongoose.models.session || mongoose.model("session", sessionSchema); 
-export default sessionModel;
+const itemModel = mongoose.models.item || mongoose.model("item", itemSchema); 
+export default itemModel;

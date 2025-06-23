@@ -1,4 +1,5 @@
 import itemModel from "../models/itemModel.js";
+import transactionModel from "../models/transactionModel.js";
 import userModel from "../models/userModel.js"; 
 import mongoose from "mongoose";
 
@@ -51,12 +52,27 @@ const listItemsByType = async (req, res) => {
   }
 };
 
+const listAllItems = async (req, res) => {
+  try {
+    const items = await itemModel.find({}); // fetch all items
+
+    return res.status(200).json({
+      success: true,
+      data: items,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error while fetching items" });
+  }
+};
+
 const buyItem = async (req, res) => {
-  const { userId, itemId } = req.body; 
+  const { itemId } = req.body; 
+  const { userID } = req; 
 
   try {
     // Find user in the database
-    const user = await userModel.findById(userId);
+    const user = await userModel.findById(userID);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -84,6 +100,14 @@ const buyItem = async (req, res) => {
       user.owned_items.push(itemId);
       await user.save({ session });
 
+      const transaction = new transactionModel({
+        userId: userID, 
+        itemId: itemId, 
+        price: item.price, 
+    })
+
+      await transaction.save(); 
+
       // Commit transaction
       await session.commitTransaction();
       session.endSession();
@@ -98,7 +122,6 @@ const buyItem = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Error processing the transaction" });
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -106,11 +129,12 @@ const buyItem = async (req, res) => {
 };
 
 const wearItem = async (req, res) => {
-  const { userId, itemId } = req.body; 
+  const { itemId } = req.body; 
+  const { userID } = req; 
   
   try {
     // Find the user in the database
-    const user = await userModel.findById(userId);
+    const user = await userModel.findById(userID);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -166,4 +190,4 @@ const wearItem = async (req, res) => {
   }
 };
 
-export {addItem, listItemsByType, buyItem, wearItem}; 
+export {addItem, listItemsByType, buyItem, wearItem, listAllItems}; 

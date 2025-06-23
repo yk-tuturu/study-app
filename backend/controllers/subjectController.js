@@ -92,7 +92,6 @@ const getAllSubjects = async(req, res) => {
     }
 }
 
-
 const getSubjectDetails = async(req, res) => {
     const { userID } = req;
     const { id } = req.query;

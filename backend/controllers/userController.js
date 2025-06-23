@@ -122,13 +122,12 @@ const changePassword = async (req, res) => {
     }
 };
 
-
-// get user's information (name, email, voucherBalance)
+// get user's information (name, email, coins)
 const getUserInfo = async (req, res) => {
     const { userID } = req; 
 
     if (!userID) {
-        return res.status(400).json({success: false, message: "Invalid input: userID is required."});
+        return res.status(400).json({success: false, message: "Invalid input: userId is required."});
     }
 
     try {
@@ -154,18 +153,16 @@ const getUserInfo = async (req, res) => {
 
 // get accessories currently worn by pet 
 const getAccessories = async (req, res) => {
-    const { userID } = req.body;
+    const { userId } = req.userID;
 
-    if (!userID) {
+    if (!userId) {
         return res.status(400).json({ success: false, message: "Invalid input: userID is required." });
     }
 
     try {
-        const user = await userModel.findById(userID)
+        const user = await userModel.findById(userId)
             .populate('pet.wearing.head')
-            .populate('pet.wearing.neck')
             .populate('pet.wearing.body')
-            .populate('pet.wearing.tail');
 
         if (!user) {
             return res.status(404).json({
@@ -176,9 +173,7 @@ const getAccessories = async (req, res) => {
 
         const accessories = {
             head: user.pet?.wearing?.head || null,
-            neck: user.pet?.wearing?.neck || null,
             body: user.pet?.wearing?.body || null,
-            tail: user.pet?.wearing?.tail || null
         };
 
         return res.status(200).json({
@@ -192,10 +187,41 @@ const getAccessories = async (req, res) => {
     }
 };
 
+// get accessories user owns
+const getOwnedAccessories = async (req, res) => {
+    const { userID } = req;
+
+    if (!userID) {
+        return res.status(400).json({ success: false, message: "Invalid input: userID is required." });
+    }
+
+    try {
+        const user = await userModel.findById(userID).populate("owned_items")
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            });
+        }
+
+        const accessories = user.owned_items; 
+
+        return res.status(200).json({
+            success: true,
+            data: accessories,
+        });
+
+    } catch (error) {
+        console.error("Error fetching user's owned accessories:", error);
+        return res.status(500).json({ success: false, message: "An error occurred while fetching user's owned accessories." });
+    }
+};
+
 // add coins after finishing a study session
 const addCoins = async (req, res) => {
     const { coinAmount } = req.body; 
-    const {userID} = req;
+    const { userID } = req;
 
     if (!userID) {
         return res.status(400).json({success: false, message: "Invalid input: userID is required."});
@@ -223,4 +249,4 @@ const addCoins = async (req, res) => {
     }
 };
 
-export {loginUser, registerUser, changePassword, getUserInfo, addCoins, getAccessories}; 
+export {loginUser, registerUser, changePassword, getUserInfo, addCoins, getAccessories, getOwnedAccessories}; 
