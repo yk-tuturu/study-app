@@ -69,20 +69,6 @@ const listAllItems = async (req, res) => {
   }
 }
 
-const listAllItems = async (req, res) => {
-  try {
-    const items = await itemModel.find({}); // fetch all items
-
-    return res.status(200).json({
-      success: true,
-      data: items,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error while fetching items" });
-  }
-};
-
 const buyItem = async (req, res) => {
   const { itemId } = req.body; 
   const { userID } = req; 
@@ -207,5 +193,4 @@ const wearItem = async (req, res) => {
   }
 };
 
-export {addItem, listItemsByType, listAllItems, buyItem, wearItem}; 
 export {addItem, listItemsByType, buyItem, wearItem, listAllItems}; 
