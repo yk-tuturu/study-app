@@ -1,6 +1,7 @@
-import {View, Image, StyleSheet, Dimensions} from "react-native"
+import {View, StyleSheet, Dimensions} from "react-native"
 import React, {useEffect} from "react"
 import Animated, { useSharedValue, withSequence, withTiming, withRepeat, useAnimatedStyle } from 'react-native-reanimated';
+import { Image } from "expo-image";
 
 import SpriteMap from "@/constants/Sprites";
 
@@ -12,6 +13,7 @@ type Props = {
 }
 
 const Cat: React.FC<Props> = ({bottomPosition, accessories}) => {
+    
     const scaleY = useSharedValue(1.1);
     const TIME = 1500;
 
@@ -44,24 +46,27 @@ const Cat: React.FC<Props> = ({bottomPosition, accessories}) => {
 
     return (
         <>
-        <Animated.Image
-        source={require("../assets/images/cat.png")}
-        style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 0}]}
-        />
+        <Animated.View style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 0}]}>
+            <Image
+                style={StyleSheet.absoluteFill}
+                source={require("../assets/images/cat.png")}
+                contentFit="fill" // important
+            />
+        </Animated.View>
         {
             accessories.map((filename, index) => {
                 return (
-                    <Animated.Image
-                    key={index}
-                    source={SpriteMap[filename]}
-                    style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}
-                    />
+                    <Animated.View key={index} style={[styles.cat, animatedStyle, {bottom: bottomPosition, zIndex: 1}]}>
+                        <Image
+                            style={StyleSheet.absoluteFill}
+                            source={SpriteMap[filename]}
+                            contentFit="fill" // important
+                        />
+                    </Animated.View>
                 )
             })
         }
         </>
-        
-
     )
 }
 

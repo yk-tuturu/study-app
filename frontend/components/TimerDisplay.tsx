@@ -1,4 +1,5 @@
-import {View, StyleSheet, Image, StyleProp, ViewStyle, Dimensions} from "react-native";
+import {View, StyleSheet, StyleProp, ViewStyle, Dimensions} from "react-native";
+import { Image } from "expo-image";
 import React, {useState} from "react";
 import { CircularProgress } from 'react-native-circular-progress';
 import colors from "@/constants/Colors";

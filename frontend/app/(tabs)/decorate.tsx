@@ -1,7 +1,8 @@
-import { Platform, StyleSheet, View, Dimensions, Text, ImageBackground, Image, LayoutChangeEvent, TouchableOpacity} from 'react-native';
+import { Platform, StyleSheet, View, Dimensions, Text, ImageBackground, LayoutChangeEvent, TouchableOpacity} from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Link} from "expo-router"
+import { Image } from 'expo-image';
 
 import {MenuOption, DropdownMenu} from '@/components/general/Dropdown';
 import Background from "@/components/Background";
@@ -24,11 +25,17 @@ import AccessoryIcon from '@/components/AccessoryIcon';
 
 const { width, height } = Dimensions.get('window');
 
+// type Accessory = {
+//   type: string,
+//   filename: string,
+//   equipped: boolean
+// }
+
 type Accessory = {
-  type: string,
-  filename: string,
-  equipped: boolean
-}
+  type: string;
+  filename: string;
+  equipped: boolean;
+};
 
 export default function Decorate() {
   const [catPosition, setCatPosition] = useState(0);

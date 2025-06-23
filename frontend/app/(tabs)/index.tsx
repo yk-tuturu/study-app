@@ -1,10 +1,11 @@
-import { Platform, StyleSheet, View, Dimensions, Text, ImageBackground, Image, Image as RNImage } from 'react-native';
+import { Platform, StyleSheet, View, Dimensions} from 'react-native';
+import { Image } from 'expo-image';
 import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Link} from "expo-router"
 
 import {MenuOption, DropdownMenu} from '@/components/general/Dropdown';
-import Background from "@/components/Background";
+import Background, {RugRef} from "@/components/Background";
 import IconButtonStatic from "@/components/buttons/IconButtonStatic"
 import ThemedText from "@/components/text/ThemedText";
 import TimerDisplay from "@/components/TimerDisplay";
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [catPosition, setCatPosition] = useState(0);
   const [coins, setCoins] = useState(0);
-  const rugRef = useRef<RNImage>(null)
+  const rugRef = useRef<RugRef>(null)
 
   const { remaining, isRunning, isEnded, endStats, getDuration, clearTimer, getCurrentSubject} = useTimer();
 
@@ -39,9 +40,9 @@ export default function HomeScreen() {
   // calculates the cat position by finding the position of the rug, so that cat is always in the middle of the rug
   useEffect(() => {
     if (rugRef.current) {
-      rugRef.current.measure((fx, fy, imageWidth, imageHeight, px, py) => {
-        setCatPosition(height - py - imageHeight * 0.5)
-      });
+      const y = rugRef.current.getLayout().y;
+      const imageHeight = rugRef.current.getLayout().height;
+      setCatPosition(height - y - imageHeight*0.5);
     }
   }, [rugRef.current]);
 

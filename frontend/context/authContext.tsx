@@ -84,7 +84,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) 
     const login = async(email: string, password: string) => {
         try {
             const res = await axios.post(`${config.BACKEND_URL}/api/user/login`, {email, password})
-
             await AsyncStorage.setItem('jwt', res.data.token);
 
             setIsLoggedIn(true);

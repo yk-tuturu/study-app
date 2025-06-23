@@ -21,12 +21,13 @@ export default function Login() {
     const {login} = useAuth();
 
     const handleLogin = async() => {
+        console.log('handle login')
         try {
             const res = await login(inputs.email, inputs.password);
             if (res.success) {
                 router.replace("/(tabs)")
             } else {
-                console.log(res.message)
+                console.log(res.message) 
             }
         } catch (err) {
             console.log(err);

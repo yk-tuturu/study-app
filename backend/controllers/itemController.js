@@ -5,14 +5,16 @@ import mongoose from "mongoose";
 
 const addItem = async (req, res) => {
     
-    let image_filename = `${req.file.filename}`
+    //let image_filename = `${req.file.filename}`
+    if (!req.body.name || !req.body.type || !req.body.price || !req.body.description) {
+      return res.status(400).json({success: false, message: "Name, type, price and description required to create new item"})
+    }
 
     const item = new itemModel({
         name: req.body.name, 
         type: req.body.type, 
         price: req.body.price, 
-        description: req.body.description, 
-        image: image_filename, 
+        description: req.body.description
     })
     
     try {
@@ -51,6 +53,21 @@ const listItemsByType = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching items" });
   }
 };
+
+const listAllItems = async (req, res) => {
+  try {
+    // query database for all items
+    const items = await itemModel.find({}).exec(); 
+
+    return res.status(200).json({
+            success: true,
+            data: items,
+        })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error while fetching items" });
+  }
+}
 
 const listAllItems = async (req, res) => {
   try {
@@ -190,4 +207,5 @@ const wearItem = async (req, res) => {
   }
 };
 
+export {addItem, listItemsByType, listAllItems, buyItem, wearItem}; 
 export {addItem, listItemsByType, buyItem, wearItem, listAllItems}; 
