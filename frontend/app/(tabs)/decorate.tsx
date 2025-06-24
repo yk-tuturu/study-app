@@ -126,7 +126,7 @@ export default function Decorate() {
               return (
                 <AccessoryIcon
                   key={index}
-                  filename={acc.filename}
+                  filename={acc.imageFile}
                   onSelect={()=>equipAccessory(acc.filename)}
                   isSelected={acc.equipped}
                 />
