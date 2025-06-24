@@ -74,7 +74,7 @@ export default function Decorate() {
     } catch (err) {
       console.error("Failed to sync accessory with backend", err);
     }
-  };
+  }; 
 
   const updateDisplayedType = (type: string) => {
     setCurrentType(type.toLowerCase());

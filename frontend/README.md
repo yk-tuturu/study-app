@@ -14,15 +14,15 @@ features added:
 - basic decorating ui is up, but all the values are hardcoded so far, need to connect to backend, index page also doesnt reflect your equipped accessories
 
 TODO: 
-- make the decorate page actually connect to the backend
-- add the store page
-- make transactions 
-- make timer track if you've left the app
-- fix the modal flashing issue
+- make the decorate page actually connect to the backend /
+- add the store page /
+- make transactions /
+- make timer track if you've left the app 
+- fix the modal flashing issue 
 - make sure to replace all instances of <Image> imported from react-native with the expo-image version
-- downscale all the mini icons, we deffo don't need them that big
-- (optional) make it so that the app is usable on a guest account? so you automatically make a guest account for new users instead of forcing them to log in
-- (very optional) being able to decorate the room would be nice
+- downscale all the mini icons, we deffo don't need them that big 
+- (optional) make it so that the app is usable on a guest account? so you automatically make a guest account for new users instead of forcing them to log in 
+- (very optional) being able to decorate the room would be nice 
 
 components: 
 I made a bunch of (hopefully reusable) UI components

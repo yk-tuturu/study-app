@@ -158,16 +158,17 @@ const wearItem = async (req, res) => {
     session.startTransaction();
 
     try {
-      // If an item is already being worn in that part, replace with the new item)
+      // if user is already wearing an item 
+      if (user.pet.wearing[item.type] != null) {
+        return res.status(400).json({ message: "Pet is wearing another item. Please unequip current item first." });
+      }
+      
+      // If user is already wearing the item 
       if (user.pet.wearing[item.type] == itemId) {
-        // Remove current item 
-        user.pet.wearing[item.type] = null; 
+        return res.status(400).json({ message: "Pet is already wearing the item" });
       }
 
-      else {
-        // change current item to item in req body
-        user.pet.wearing[item.type] = itemId;
-      }
+      user.pet.wearing[item.type] = itemId;
 
       // Save the user with the updated wearing list
       await user.save({ session });
@@ -193,4 +194,67 @@ const wearItem = async (req, res) => {
   }
 };
 
-export {addItem, listItemsByType, buyItem, wearItem, listAllItems}; 
+const takeOffItem = async (req, res) => {
+  const { itemId } = req.body; 
+  const { userID } = req; 
+  
+  try {
+    // Find the user in the database
+    const user = await userModel.findById(userID);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the item the user wants to wear
+    const item = await itemModel.findById(itemId);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // Check if the user owns the item
+    if (!user.owned_items.includes(itemId)) {
+      return res.status(400).json({ message: "You do not own this item" });
+    }
+
+    // Start a session for the transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // if user is already wearing an item 
+      if (user.pet.wearing[item.type] === null) {
+        return res.status(400).json({ message: "Pet is not wearing an item." });
+      }
+      
+      // If user is wearing another item
+      if (user.pet.wearing[item.type] != itemId) {
+        return res.status(400).json({ message: "Pet is wearing another item" });
+      }
+
+      user.pet.wearing[item.type] = null;
+
+      // Save the user with the updated wearing list
+      await user.save({ session });
+
+      // Commit the transaction
+      await session.commitTransaction();
+      session.endSession();
+
+      // Send a success response
+      res.status(200).json({
+        message: 'item unequipped successfully',
+        wearing: user.pet.wearing 
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.error(error);
+      res.status(500).json({ message: "Error processing the transaction" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export {addItem, listItemsByType, buyItem, wearItem, listAllItems, takeOffItem}; 
