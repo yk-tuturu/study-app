@@ -79,7 +79,6 @@ const getAllSubjects = async(req, res) => {
 
     try {
         const subjects = await subjectModel.find({userId: userID});
-        console.log(subjects);
 
         return res.status(200).json({
             success: true,
@@ -102,7 +101,6 @@ const getSubjectDetails = async(req, res) => {
 
     try {
         const subject = await subjectModel.findOne({userId: userID, _id: subjectId});
-        console.log(subject)
 
         return res.status(200).json({
             success: true,

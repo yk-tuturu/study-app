@@ -153,14 +153,14 @@ const getUserInfo = async (req, res) => {
 
 // get accessories currently worn by pet 
 const getAccessories = async (req, res) => {
-    const { userId } = req.userID;
+    const { userID } = req;
 
-    if (!userId) {
+    if (!userID) {
         return res.status(400).json({ success: false, message: "Invalid input: userID is required." });
     }
 
     try {
-        const user = await userModel.findById(userId)
+        const user = await userModel.findById(userID)
             .populate('pet.wearing.head')
             .populate('pet.wearing.body')
 

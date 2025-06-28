@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 
 import axios, { AxiosError } from 'axios';
 import config from '@/config';
@@ -155,11 +156,19 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
 
     const pauseTimer = useCallback(()=> {
-        pausedRef.current = true
+        pausedRef.current = true; 
+         if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+  }
     }, [])
 
     const unpauseTimer = useCallback(()=>{
-        pausedRef.current = false
+        pausedRef.current = false; 
+        if (pausedRef.current && animationFrameRef.current === null) {
+        prevFrameRef.current = Date.now();
+        animationFrameRef.current = requestAnimationFrame(updateRemaining);
+    }
     }, [])
     
     // for the stop button when the timer is terminated early
@@ -187,6 +196,28 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const getCurrentSubject = useCallback(()=> {
         return subjectRef.current;
     }, [])
+
+    useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+        if (nextAppState === 'background' || nextAppState === 'inactive') {
+        if (isRunning) {
+            pauseTimer();
+            console.log("Timer paused as app is inactive");
+        }
+        } else if (nextAppState === 'active') {
+        if (isRunning && getPaused()) {
+            unpauseTimer();
+            console.log("Timer resumed as app is now active");
+        }
+        }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+        subscription.remove();
+    };
+    }, [isRunning, pauseTimer, unpauseTimer, getPaused]);
 
   return (
     <TimerContext.Provider value={{ startTimer,

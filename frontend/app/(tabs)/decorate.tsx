@@ -32,14 +32,16 @@ const { width, height } = Dimensions.get('window');
 // }
 
 type Accessory = {
+  _id: string; 
   type: string;
-  filename: string;
+  imageFile: string;
   equipped: boolean;
 };
 
 export default function Decorate() {
   const [catPosition, setCatPosition] = useState(0);
   const [accessories, setAccessories] = useState<Accessory[]>([])
+  const [accessoriesWorn, setAccessoriesWorn] = useState({})
   const [currentType, setCurrentType] = useState<string>("head");
   const types = ["Head", "Body"]
   const rugRef = useRef<Image>(null)
@@ -58,23 +60,40 @@ export default function Decorate() {
       console.log("error fetching owned accessories");
     }
   };
+  
+  const fetchAccessoriesWorn = async () => {
+    try {
+      const res = await axios.get(`${config.BACKEND_URL}/api/user/accessories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAccessoriesWorn(res.data.data);
+    } catch (err) {
+      console.log("error fetching accessories currently being worn");
+    }
+  };
 
   useEffect(() => {
     fetchAccessories();
   }, [token]);
 
-  const equipAccessory = async (filename: string) => {
-    setAccessories(prev => 
-      prev.map(acc => acc.filename === filename ? {...acc, equipped: !acc.equipped} : acc)
-    );
-    try {
-      await axios.post(`${config.BACKEND_URL}/item/wear`, { filename }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    } catch (err) {
-      console.error("Failed to sync accessory with backend", err);
-    }
-  }; 
+  useEffect(() => {
+    fetchAccessoriesWorn();
+  }, [token]);
+
+
+const toggleAccessory = async (imageFile: string, isSelected: boolean) => {
+  try {
+    const endpoint = isSelected ? "takeOff" : "wear";
+    await axios.post(`${config.BACKEND_URL}/api/item/${endpoint}`, { imageFile }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    await fetchAccessoriesWorn();
+  } catch (err) {
+    console.error("Failed to sync accessory with backend", err);
+  }
+};
 
   const updateDisplayedType = (type: string) => {
     setCurrentType(type.toLowerCase());
@@ -104,7 +123,7 @@ export default function Decorate() {
         onLayout={handleRugLayout}
         resizeMode="contain"
       />
-      <Cat bottomPosition={catPosition} accessories={accessories.filter(a => a.equipped && a.filename !== undefined).map(a => a.filename as string)}/>
+      <Cat bottomPosition={catPosition} accessories={accessories.filter(a => a.equipped && a.imageFile !== undefined).map(a => a.imageFile as string)}/>
       <View style={styles.panel}>
         <View style={styles.sidebar}>
           {
@@ -121,18 +140,23 @@ export default function Decorate() {
           }
         </View>
         <View style={styles.accessoryList}>
-          {
-            accessories.filter(a=>a.type===currentType).map((acc, index) => {
+        {
+          accessories
+            .filter(a => a.type.toLowerCase() === currentType)
+            .map((acc, index) => {
+              const isSelected = accessoriesWorn?.[acc.type]?.imageFile === acc.imageFile;
+
               return (
                 <AccessoryIcon
                   key={index}
-                  filename={acc.imageFile}
-                  onSelect={()=>equipAccessory(acc.filename)}
-                  isSelected={acc.equipped}
+                  imageFile={acc.imageFile}
+                  onSelect={() => toggleAccessory(acc.imageFile, isSelected)}
+                  isSelected={isSelected}
                 />
-              )
+              );
             })
-          }
+        }
+
         </View>
       </View>
       <TouchableOpacity onPress={()=>router.navigate("/(tabs)")}>

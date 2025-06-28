@@ -6,18 +6,18 @@ import colors from "@/constants/Colors"
 import IconMap from "@/constants/Icons"
 
 interface Props {
-    filename: string,
+    imageFile: string,
     onSelect: ()=>void,
     isSelected: boolean
 }
 
-const AccessoryIcon: React.FC<Props> = ({filename, onSelect, isSelected}) => {
+const AccessoryIcon: React.FC<Props> = ({imageFile, onSelect, isSelected}) => {
     return (
         <>
         <TouchableOpacity onPress={onSelect}>
             <View style={styles.container}>
                 <Image
-                    source={IconMap[filename]}
+                    source={IconMap[imageFile]}
                     style={styles.iconImage}
                 />
                 <View style={[styles.overlay, {opacity: isSelected ? 0.5 : 0}]}></View>

@@ -1,6 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
+import { Image } from "expo-image";
 import config from "@/config";
 import { useAuth } from "@/context/authContext";
 import ThemedText from "@/components/text/ThemedText";
