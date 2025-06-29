@@ -28,6 +28,7 @@ export default function HomeScreen() {
   const [catPosition, setCatPosition] = useState(0);
   const [coins, setCoins] = useState(0);
   const rugRef = useRef<RugRef>(null)
+  const [accessoriesWorn, setAccessoriesWorn] = useState({})
 
   const { remaining, isRunning, isEnded, endStats, getDuration, clearTimer, getCurrentSubject} = useTimer();
 
@@ -37,6 +38,20 @@ export default function HomeScreen() {
   
   const router = useRouter();
 
+  // fetch accessories user's cat is currently wearing 
+  const fetchAccessoriesWorn = async () => {
+    try {
+      const res = await axios.get(`${config.BACKEND_URL}/api/user/accessories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAccessoriesWorn(res.data.data); 
+    } catch (err) {
+      console.log("error fetching accessories currently being worn");
+    }
+  };
+
   // calculates the cat position by finding the position of the rug, so that cat is always in the middle of the rug
   useEffect(() => {
     if (rugRef.current) {
@@ -45,6 +60,10 @@ export default function HomeScreen() {
       setCatPosition(height - y - imageHeight*0.5);
     }
   }, [rugRef.current]);
+
+  useEffect(() => {
+    fetchAccessoriesWorn();
+  }, [token]);
 
   useEffect(()=> {
     if (isRunning && isEnded) {
@@ -60,7 +79,7 @@ export default function HomeScreen() {
     try {
       const res = await axios.get(`${config.BACKEND_URL}/api/user/getInfo`, {
         headers: {
-          Authorization: `Bearer: ${token}`
+          Authorization: `Bearer ${token}`
         }
       })
 
@@ -130,7 +149,7 @@ export default function HomeScreen() {
         </MenuOption>
       </DropdownMenu>
 
-      <Cat bottomPosition={catPosition} accessories={["ribbon", "suit"]}/>
+      <Cat bottomPosition={catPosition} accessories={Object.values(accessoriesWorn).filter(a => a !== null).map(a => a.imageFile as string)}/>
 
       <View style={styles.coinPanel}>
           <Image

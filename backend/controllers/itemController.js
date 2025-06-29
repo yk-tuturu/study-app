@@ -148,6 +148,8 @@ const wearItem = async (req, res) => {
 
     // Find the item the user wants to wear
     const item = await itemModel.findById(itemId);
+    console.log(item)
+    console.log(user)
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }

@@ -14,12 +14,12 @@ features added:
 - basic decorating ui is up, but all the values are hardcoded so far, need to connect to backend, index page also doesnt reflect your equipped accessories
 
 TODO: 
-- make the decorate page actually connect to the backend /
-- add the store page /
-- make transactions /
-- make timer track if you've left the app / 
+- make the decorate page actually connect to the backend
+- add the store page
+- make transactions
+- make timer track if you've left the app
 - fix the modal flashing issue 
-- make sure to replace all instances of <Image> imported from react-native with the expo-image version / 
+- make sure to replace all instances of <Image> imported from react-native with the expo-image version
 - downscale all the mini icons, we deffo don't need them that big 
 - (optional) make it so that the app is usable on a guest account? so you automatically make a guest account for new users instead of forcing them to log in 
 - (very optional) being able to decorate the room would be nice 
@@ -76,3 +76,22 @@ constants:
 also theres a config.ts file storing the backend url 
 there's a ParseError function in util.ts for parsing axioserrors and returning only the error message
 
+
+
+
+Shu Jin's additions: 
+hello yk this is what i have done so far: 
+- spent too long trying to remember how to use react 
+- took an embarassing amount of time to realise this is typescript and learnt the syntax
+
+okay actual stuff:
+- shop page is working! can make transactions + connected to the backend 
+- timer will now stop when the app is backgrounded, when the app resumes, the timer will continue on 
+- decorate page is connected to the backend and will list the accessories the user owns 
+- equip + unequip function in the decorate page is working too YAYY ++ the changes will show in the index page too (meaning what the cat is wearing will match what is equipped in the backend yay)
+- replaced all react-native <Image> with the expo-client one 
+
+currently working on: 
+- modal flashing issue (still trying to understand how to resolve)
+- drawing more accessories 
+- still trying to think about how to implement the guest account thing 

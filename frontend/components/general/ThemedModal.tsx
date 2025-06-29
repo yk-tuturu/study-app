@@ -14,21 +14,25 @@ type Props = {
 const ThemedModal: React.FC<Props> = ({children, isVisible, onDismiss, style, onModalHide}) => {
     return (
         <Modal
-            animationIn="fadeInUp"
-            animationOut="fadeOutDown"
-            backdropOpacity={0.5}
-            isVisible={isVisible}
-            avoidKeyboard={true}
-            onBackButtonPress={onDismiss}
-            onBackdropPress={onDismiss}
-            onModalHide={onModalHide}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        backdropOpacity={0.5}
+        isVisible={isVisible}
+        avoidKeyboard={true}
+        useNativeDriver={true}
+        onBackButtonPress={onDismiss}
+        onBackdropPress={onDismiss}
+        onModalHide={() => {
+            setTimeout(() => onModalHide?.(), 10); // to prevent flicker
+        }}
         >
-            <View style={[styles.modalContent, style]}>
-                {children}
-            </View>
+        <View style={[styles.modalContent, style]}>
+            {children}
+        </View>
         </Modal>
     )
 }
+
 
 const styles = StyleSheet.create({
     modalContent: {

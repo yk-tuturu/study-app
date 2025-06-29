@@ -52,6 +52,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const durationRef = useRef<number>(0); // the total duration that the timer is set to countdown
     const pausedRef = useRef<boolean>(false); 
+    const pausedAtRef = useRef<number | null>(null);
+    const startTimeRef = useRef<number | null>(null);
     const subjectRef = useRef<SubjectInfoType>({
         id: "",
         name: ""
@@ -59,48 +61,50 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const {token} = useAuth()
 
-    const prevFrameRef = useRef<number>(0); // used to calculate delta time per frame
-
     const updateRemaining = () => {
+        if (!startTimeRef.current) return;
+
         if (pausedRef.current) {
             animationFrameRef.current = requestAnimationFrame(updateRemaining);
-            prevFrameRef.current = Date.now();
-            return
+            return;
         }
 
         const now = Date.now();
-        const deltaTime = now - prevFrameRef.current;
-        elapsedRef.current += deltaTime;
-
-        const newRemaining = Math.max(0, durationRef.current - elapsedRef.current)
+        elapsedRef.current = now - startTimeRef.current;
+        const newRemaining = Math.max(0, durationRef.current - elapsedRef.current);
 
         setRemaining(newRemaining);
 
         if (newRemaining > 0) {
-            prevFrameRef.current = Date.now();
             animationFrameRef.current = requestAnimationFrame(updateRemaining);
         } else {
             console.log("timer end");
             setIsEnded(true);
-            submitTime(Math.floor(elapsedRef.current / 1000 / 60))
+            submitTime(Math.floor(elapsedRef.current / 1000 / 60));
             animationFrameRef.current = null;
         }
-    }
+    };
 
     const startTimer = useCallback((newDuration: number, subjectId: string, subjectName: string) => {
         if (isRunning) return;
 
         setIsRunning(true);
         setRemaining(newDuration);
-        prevFrameRef.current = Date.now();
+        
+        startTimeRef.current = Date.now();
+        elapsedRef.current = 0;
         durationRef.current = newDuration;
+
+        pausedRef.current = false;
+        pausedAtRef.current = null;
+
         subjectRef.current = {
             id: subjectId,
             name: subjectName
-        }
-        animationFrameRef.current = requestAnimationFrame(updateRemaining);
+        };
 
-    }, [isRunning, updateRemaining])
+        animationFrameRef.current = requestAnimationFrame(updateRemaining);
+    }, [isRunning]);
 
     // called when timer ends 
     // submits results to backend
@@ -110,13 +114,13 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 subjectId: subjectRef.current.id,
                 mins: Math.max(1, mins) // clamp min of 1 for testing, since i often use a 0.1 min timer for testing
             }, {headers: {
-                Authorization: `Bearer: ${token}`
+                Authorization: `Bearer ${token}`
             }})
 
             const coinRes = await axios.post(`${config.BACKEND_URL}/api/user/addCoins`, {
                 coinAmount: Math.max(Math.floor(mins / 5), 1)
             }, {headers: {
-                Authorization: `Bearer: ${token}`
+                Authorization: `Bearer ${token}`
             }})
 
             setEndStats({
@@ -153,24 +157,33 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
     }, [])
 
-    
+    const pauseTimer = useCallback(() => {
+        pausedRef.current = true;
 
-    const pauseTimer = useCallback(()=> {
-        pausedRef.current = true; 
-         if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-  }
-    }, [])
+        if (animationFrameRef.current !== null) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = null;
+        }
 
-    const unpauseTimer = useCallback(()=>{
-        pausedRef.current = false; 
-        if (pausedRef.current && animationFrameRef.current === null) {
-        prevFrameRef.current = Date.now();
-        animationFrameRef.current = requestAnimationFrame(updateRemaining);
-    }
-    }, [])
-    
+        pausedAtRef.current = Date.now(); // save when we paused
+        }, []);
+
+    const unpauseTimer = useCallback(() => {
+        if (!startTimeRef.current) return;
+
+        if (pausedRef.current && pausedAtRef.current !== null) {
+            const pausedDuration = Date.now() - pausedAtRef.current;
+            startTimeRef.current += pausedDuration;
+        }
+
+        pausedRef.current = false;
+        pausedAtRef.current = null;
+
+        if (animationFrameRef.current === null) {
+            animationFrameRef.current = requestAnimationFrame(updateRemaining);
+        }
+    }, []);
+
     // for the stop button when the timer is terminated early
     const endTimer = useCallback(async()=>{
         if (animationFrameRef.current !== null) {

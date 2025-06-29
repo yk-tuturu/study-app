@@ -48,6 +48,7 @@ export default function Decorate() {
   const {token} = useAuth();
   const router = useRouter();
 
+  // fetch accessories owned by the user
   const fetchAccessories = async () => {
     try {
       const res = await axios.get(`${config.BACKEND_URL}/api/user/ownedAccessories`, {
@@ -61,6 +62,7 @@ export default function Decorate() {
     }
   };
   
+  // fetch accessories user's cat is currently wearing 
   const fetchAccessoriesWorn = async () => {
     try {
       const res = await axios.get(`${config.BACKEND_URL}/api/user/accessories`, {
@@ -68,7 +70,7 @@ export default function Decorate() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setAccessoriesWorn(res.data.data);
+      setAccessoriesWorn(res.data.data); 
     } catch (err) {
       console.log("error fetching accessories currently being worn");
     }
@@ -82,11 +84,14 @@ export default function Decorate() {
     fetchAccessoriesWorn();
   }, [token]);
 
-
-const toggleAccessory = async (imageFile: string, isSelected: boolean) => {
+// if accessory is currently worn - uses takeOff endpoint
+// if accessory is not being worn - uses wear endpoint 
+const toggleAccessory = async (itemId: string, isSelected: boolean) => {
   try {
     const endpoint = isSelected ? "takeOff" : "wear";
-    await axios.post(`${config.BACKEND_URL}/api/item/${endpoint}`, { imageFile }, {
+    await axios.post(`${config.BACKEND_URL}/api/item/${endpoint}`, { 
+      itemId: itemId 
+    }, {
       headers: { Authorization: `Bearer ${token}` }
     });
     await fetchAccessoriesWorn();
@@ -123,7 +128,7 @@ const toggleAccessory = async (imageFile: string, isSelected: boolean) => {
         onLayout={handleRugLayout}
         resizeMode="contain"
       />
-      <Cat bottomPosition={catPosition} accessories={accessories.filter(a => a.equipped && a.imageFile !== undefined).map(a => a.imageFile as string)}/>
+      <Cat bottomPosition={catPosition} accessories={Object.values(accessoriesWorn).filter(a => a !== null).map(a => a.imageFile as string)}/>
       <View style={styles.panel}>
         <View style={styles.sidebar}>
           {
@@ -150,7 +155,7 @@ const toggleAccessory = async (imageFile: string, isSelected: boolean) => {
                 <AccessoryIcon
                   key={index}
                   imageFile={acc.imageFile}
-                  onSelect={() => toggleAccessory(acc.imageFile, isSelected)}
+                  onSelect={() => toggleAccessory(acc._id, isSelected)}
                   isSelected={isSelected}
                 />
               );
