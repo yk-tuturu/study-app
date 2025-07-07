@@ -1,6 +1,25 @@
 const SpriteMap: Record<string, any> = {
   'ribbon': require('../assets/accessorySprites/ribbon.png'),
   'suit': require('../assets/accessorySprites/suit.png'),
+  'blackhat': require('../assets/accessorySprites/blackhat.png'),
+  'sunhat': require('../assets/accessorySprites/sunhat.png'),
+  'tiara': require('../assets/accessorySprites/tiara.png'),
+  'sunglasses': require('../assets/accessorySprites/sunglasses.png'),
+  'starglasses': require('../assets/accessorySprites/starglasses.png'),
+  'bell': require('../assets/accessorySprites/bell.png'),
+  'beret': require('../assets/accessorySprites/beret.png'),
+  'bluehat': require('../assets/accessorySprites/bluehat.png'),
+  'flowercrown': require('../assets/accessorySprites/flowercrown.png'),
+  'greenhat': require('../assets/accessorySprites/greenhat.png'),
+  'joker': require('../assets/accessorySprites/joker.png'),
+  'mexicanhat': require('../assets/accessorySprites/mexicanhat.png'), 
+  'purpleglasses': require('../assets/accessorySprites/purpleglasses.png'), 
+  'pinkpartyhat': require('../assets/accessorySprites/pinkpartyhat.png'),
+  'purplepartyhat': require('../assets/accessorySprites/purplepartyhat.png'),
+  'ribbonhat': require('../assets/accessorySprites/ribbonhat.png'),
+  'santahat': require('../assets/accessorySprites/santahat.png'),
+  'star': require('../assets/accessorySprites/star.png'),
+  'wizardhat': require('../assets/accessorySprites/wizardhat.png'),
 };
 
 export default SpriteMap

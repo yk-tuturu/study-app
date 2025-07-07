@@ -4,7 +4,7 @@ import authMiddleware from "../middleware/auth.js";
 
 const itemRouter = express.Router()
 
-itemRouter.post('add', addItem)
+itemRouter.post('/add', addItem)
 itemRouter.post('/listItemsByType', listItemsByType)
 itemRouter.get('/listAll', listAllItems)
 itemRouter.post('/buy', authMiddleware, buyItem)

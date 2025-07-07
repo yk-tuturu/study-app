@@ -1,5 +1,5 @@
 const config = {
-  BACKEND_URL: 'http://192.168.1.66:4000', 
+  BACKEND_URL: 'exp://172.23.93.2:4000', 
 };
 
 export default config;

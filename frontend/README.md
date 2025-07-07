@@ -88,7 +88,7 @@ okay actual stuff:
 - shop page is working! can make transactions + connected to the backend 
 - timer will now stop when the app is backgrounded, when the app resumes, the timer will continue on 
 - decorate page is connected to the backend and will list the accessories the user owns 
-- equip + unequip function in the decorate page is working too YAYY ++ the changes will show in the index page too (meaning what the cat is wearing will match what is equipped in the backend yay)
+- equip + unequip function in the decorate page is working too YAYY + the changes will show in the index page too (meaning what the cat is wearing will match what is equipped in the backend yay)
 - replaced all react-native <Image> with the expo-client one 
 
 currently working on: 

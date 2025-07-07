@@ -1,6 +1,25 @@
 const IconMap: Record<string, any> = {
   'ribbon': require('../assets/accessoryIcons/ribbonIcon.png'),
   'suit': require('../assets/accessoryIcons/suitIcon.png'),
+  'blackhat': require('../assets/accessoryIcons/blackhatIcon.png'),
+  'sunhat': require('../assets/accessoryIcons/sunhatIcon.png'),
+  'tiara': require('../assets/accessoryIcons/tiaraIcon.png'),
+  'sunglasses': require('../assets/accessoryIcons/sunglassesIcon.png'),
+  'starglasses': require('../assets/accessoryIcons/starglassesIcon.png'),
+  'bell': require('../assets/accessoryIcons/bellIcon.png'),
+  'beret': require('../assets/accessoryIcons/beretIcon.png'),
+  'bluehat': require('../assets/accessoryIcons/bluehatIcon.png'),
+  'flowercrown': require('../assets/accessoryIcons/flowercrownIcon.png'),
+  'greenhat': require('../assets/accessoryIcons/greenhatIcon.png'),
+  'joker': require('../assets/accessoryIcons/jokerIcon.png'),
+  'mexicanhat': require('../assets/accessoryIcons/mexicanhatIcon.png'), 
+  'purpleglasses': require('../assets/accessoryIcons/purpleglassesIcon.png'), 
+  'pinkpartyhat': require('../assets/accessoryIcons/pinkpartyhatIcon.png'),
+  'purplepartyhat': require('../assets/accessoryIcons/purplepartyhatIcon.png'),
+  'ribbonhat': require('../assets/accessoryIcons/ribbonhatIcon.png'),
+  'santahat': require('../assets/accessoryIcons/santahatIcon.png'),
+  'star': require('../assets/accessoryIcons/starIcon.png'),
+  'wizardhat': require('../assets/accessoryIcons/wizardhatIcon.png'),
 };
 
 export default IconMap

@@ -6,6 +6,7 @@ import colors from "@/constants/Colors";
 import ThemedText from "./text/ThemedText";
 import TextOutline from "./text/TextOutline";
 import IconButton from "./buttons/IconButton";
+import { useEffect } from "react";
 
 import {useTimer} from "@/context/timerContext";
 import ThemedModal from "./general/ThemedModal";
@@ -27,14 +28,21 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
     const paddedMins = String(mins).padStart(2, '0'); 
     const paddedSecs = String(secs).padStart(2, '0'); 
 
-    const {pauseTimer, unpauseTimer, getPaused, endTimer} = useTimer();
+    const {
+    pauseTimer,
+    unpauseTimer,
+    getPaused,
+    endTimer,
+    wasPausedByAppBackground,
+    clearWasPausedByAppBackground, 
+    isPaused, 
+    } = useTimer();
 
     const [showConfirmStopModal, setShowConfirmStopModal] = useState(false);
+    const [showAppInactiveModal, setShowAppInactiveModal] = useState(false);
 
     function handlePause() {
-        console.log("pausing");
-        console.log(getPaused());
-        if (getPaused()) {
+        if (isPaused) {
             unpauseTimer();
         } else {
             pauseTimer();
@@ -60,6 +68,17 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
         
         endTimer()
     }
+
+    function dismissAppInactiveModal() {
+    setShowAppInactiveModal(false);
+    clearWasPausedByAppBackground();
+    }
+
+    useEffect(() => {
+    if (wasPausedByAppBackground) {
+        setShowAppInactiveModal(true);
+    }
+    }, [wasPausedByAppBackground]);
 
     return (
         <View style={style}>
@@ -87,7 +106,7 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
                 <View style={{position: "absolute", alignSelf: "center", bottom: "20%"}}>
                     <View style={{flexDirection: "row"}}>
                         <IconButton style={{marginHorizontal: 16}} onPress={handlePause}>
-                        <Image source={require("../assets/images/pause.png")} style={styles.timerButton} />
+                        <Image source={isPaused? require("../assets/images/play.png") : require("../assets/images/pause.png")} style={styles.timerButton} />
                         </IconButton>
                         <IconButton style={{marginHorizontal: 16}} onPress={handleStop}>
                         <Image source={require("../assets/images/stop.png")} style={styles.timerButton} />
@@ -105,6 +124,18 @@ const TimerDisplay: React.FC<Props> = ({time, duration, style}) => {
                     <ThemedText type="font_md">Confirm Stop?</ThemedText>
                     <TextButton onPress={hideModal}>
                         <ThemedText type="font_md">Yes</ThemedText>
+                    </TextButton>
+                </View>
+            </ThemedModal>
+            <ThemedModal
+                isVisible={showAppInactiveModal}
+                onDismiss={dismissAppInactiveModal}
+                style={{marginHorizontal: 16}}
+                >
+                <View style={{alignItems: "center", padding: 16}}>
+                    <ThemedText type="font_md">Timer Paused due to Inactivity</ThemedText>
+                    <TextButton onPress={dismissAppInactiveModal}>
+                    <ThemedText type="font_md">OK</ThemedText>
                     </TextButton>
                 </View>
             </ThemedModal>

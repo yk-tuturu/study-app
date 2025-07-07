@@ -32,6 +32,9 @@ type TimerContextType = {
     clearTimer: ()=>void;
     endTimer: ()=>void;
     getCurrentSubject: ()=>SubjectInfoType;
+    wasPausedByAppBackground: boolean;
+    clearWasPausedByAppBackground: () => void;
+    isPaused: boolean; 
 };
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -39,7 +42,8 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isRunning, setIsRunning] = useState(false);
     const [remaining, setRemaining] = useState(0);
-
+    const [isPaused, setIsPaused] = useState(false); 
+ 
     const [isEnded, setIsEnded] = useState(false); // when this is true, show the modal that appears at the end of the timer
     const [endStats, setEndStats] = useState<EndStatsType>({
         currentTime: 0,
@@ -58,6 +62,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: "",
         name: ""
     })
+    const [wasPausedByAppBackground, setWasPausedByAppBackground] = useState(false);
 
     const {token} = useAuth()
 
@@ -90,6 +95,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         setIsRunning(true);
         setRemaining(newDuration);
+        setIsPaused(false); 
         
         startTimeRef.current = Date.now();
         elapsedRef.current = 0;
@@ -141,6 +147,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const clearTimer = useCallback(()=> {
         setIsEnded(false);
         setIsRunning(false);
+        setIsPaused(false);
         setRemaining(0);
         setEndStats({
             currentTime: 0,
@@ -159,6 +166,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const pauseTimer = useCallback(() => {
         pausedRef.current = true;
+        setIsPaused(true);
 
         if (animationFrameRef.current !== null) {
             cancelAnimationFrame(animationFrameRef.current);
@@ -175,7 +183,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const pausedDuration = Date.now() - pausedAtRef.current;
             startTimeRef.current += pausedDuration;
         }
-
+        setIsPaused(false); 
         pausedRef.current = false;
         pausedAtRef.current = null;
 
@@ -191,6 +199,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
         animationFrameRef.current = null;
         await submitTime(Math.floor(elapsedRef.current / 1000 / 60));
+        setIsPaused(false); 
 
     }, [submitTime])
 
@@ -210,17 +219,21 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return subjectRef.current;
     }, [])
 
+    const clearWasPausedByAppBackground = useCallback(() => {
+        setWasPausedByAppBackground(false);
+    }, []);
+
     useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
         if (nextAppState === 'background' || nextAppState === 'inactive') {
-        if (isRunning) {
+        if (isRunning && !getPaused()) {
             pauseTimer();
             console.log("Timer paused as app is inactive");
         }
         } else if (nextAppState === 'active') {
         if (isRunning && getPaused()) {
-            unpauseTimer();
-            console.log("Timer resumed as app is now active");
+            console.log("App is active but timer remains paused");
+            setWasPausedByAppBackground(true);
         }
         }
     };
@@ -230,23 +243,29 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
         subscription.remove();
     };
-    }, [isRunning, pauseTimer, unpauseTimer, getPaused]);
+    }, [isRunning, pauseTimer, getPaused]);
+
 
   return (
-    <TimerContext.Provider value={{ startTimer,
-        getDuration,
-        isRunning,
-        remaining,
-        isEnded,
-        endStats,
-        pauseTimer,
-        unpauseTimer,
-        getPaused,
-        getElapsedInMins,
-        clearTimer,
-        endTimer,
-        getCurrentSubject }}>
-      {children}
+    <TimerContext.Provider value={{
+    startTimer,
+    getDuration,
+    isRunning,
+    remaining,
+    isEnded,
+    endStats,
+    isPaused, 
+    pauseTimer,
+    unpauseTimer,
+    getPaused,
+    getElapsedInMins,
+    clearTimer,
+    endTimer,
+    getCurrentSubject,
+    wasPausedByAppBackground,
+    clearWasPausedByAppBackground
+    }}>
+    {children}
     </TimerContext.Provider>
   );
 };
