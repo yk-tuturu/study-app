@@ -86,12 +86,12 @@ hello yk this is what i have done so far:
 
 okay actual stuff:
 - shop page is working! can make transactions + connected to the backend 
-- timer will now stop when the app is backgrounded, when the app resumes, the timer will continue on 
+- timer will now stop when the app is backgrounded, when the app resumes, timer remains paused and a modal will appear telling user timer has stopped 
 - decorate page is connected to the backend and will list the accessories the user owns 
 - equip + unequip function in the decorate page is working too YAYY + the changes will show in the index page too (meaning what the cat is wearing will match what is equipped in the backend yay)
-- replaced all react-native <Image> with the expo-client one 
+- replaced all react-native <Image> with the expo-client one
+- added more accessories! (we now have 10+ head accessories and around 5 body accessories)
 
-currently working on: 
-- modal flashing issue (still trying to understand how to resolve)
-- drawing more accessories 
-- still trying to think about how to implement the guest account thing 
+to work on: 
+- modal flashing issue (still trying to understand how to resolve - especially obvious for timer related modals)
+- potentially decorate the room?
