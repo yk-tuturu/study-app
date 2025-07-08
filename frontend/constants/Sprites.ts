@@ -20,6 +20,11 @@ const SpriteMap: Record<string, any> = {
   'santahat': require('../assets/accessorySprites/santahat.png'),
   'star': require('../assets/accessorySprites/star.png'),
   'wizardhat': require('../assets/accessorySprites/wizardhat.png'),
+  'clown': require('../assets/accessorySprites/clown.png'),
+  'ballerina': require('../assets/accessorySprites/ballerina.png'),
+  'school': require('../assets/accessorySprites/school.png'),
+  'police': require('../assets/accessorySprites/police.png'),
+  'firefighter': require('../assets/accessorySprites/firefighter.png'),
 };
 
 export default SpriteMap

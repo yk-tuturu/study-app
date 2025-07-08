@@ -20,6 +20,11 @@ const IconMap: Record<string, any> = {
   'santahat': require('../assets/accessoryIcons/santahatIcon.png'),
   'star': require('../assets/accessoryIcons/starIcon.png'),
   'wizardhat': require('../assets/accessoryIcons/wizardhatIcon.png'),
+  'school': require('../assets/accessoryIcons/schoolIcon.png'),
+  'ballerina': require('../assets/accessoryIcons/ballerinaIcon.png'),
+  'clown': require('../assets/accessoryIcons/clownIcon.png'),
+  'police': require('../assets/accessoryIcons/policeIcon.png'),
+  'firefighter': require('../assets/accessoryIcons/firefighterIcon.png'),
 };
 
 export default IconMap
