@@ -1,4 +1,5 @@
 # Study App
+<img width="1176" height="860" alt="image" src="https://github.com/user-attachments/assets/14412e10-2260-4051-9a3d-ff5d94b0d2f8" />
 
 This study app is a productivity tool that aims to help you stay focused while studying, with the company of your own virtual cat! Stay on task using the built-in study timer, earn points for completing study sessions, and use those points to decorate and accessorise your adorable cat.
 
